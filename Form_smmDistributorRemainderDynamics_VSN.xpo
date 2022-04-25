@@ -1,0 +1,866 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: FRM
+
+; Microsoft Dynamics AX Forms unloaded
+; --------------------------------------------------------------------------------
+FRMVERSION 12
+
+FORM #smmDistributorRemainderDynamics_VSN
+  PROPERTIES
+    Name                #smmDistributorRemainderDynamics_VSN
+    Origin              #{89D72FB7-6AEE-4A0C-995C-2CF5988C03C0}
+  ENDPROPERTIES
+  
+  METHODS
+    SOURCE #classDeclaration
+      #public class FormRun extends ObjectRun
+      #{
+      #    XMLExcelReport_DistrRemDynamics_vsn      caller;
+      #    smmSecondSalesGrouping_ICL               grouping;
+      #    TransDate                                dateFrom, dateTo;
+      #
+      #
+      #    #define.CurrentVersion(2)
+      #    #localmacro.CurrentList
+      #        dateFrom, dateTo
+      #    #endmacro
+      #}
+    ENDSOURCE
+    SOURCE #closeOk
+      #public void closeOk()
+      #{
+      #    DialogRunbase dialog = element.args().caller();
+      #    ;
+      #    dialog.updateServer();
+      #    if (caller.checkCloseDialog())
+      #    {
+      #        caller.parmRestOnDateFrom(RestOnDateFrom.dateValue());
+      #        caller.parmRestOnDateTo(restOnDateTo.dateValue());
+      #        //caller.parmDontShowSales(DontShowSales.value());
+      #        caller.parmListProductTableRefRecId(Items.value());
+      #        caller.parmStorageUnit(Unit.selection());
+      #        caller.parmIsFold(Fold.value());
+      #        caller.parmGrouping(grouping);
+      #
+      #        super();
+      #    }
+      #
+      #}
+      #
+    ENDSOURCE
+    SOURCE #dispItemName
+      #display NameProduct_ICL dispItemName()
+      #{
+      #    return ListProductTable_ICL::findRecId(Items.value()).Name;
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingBrand
+      #edit NoYes editGroupingBrand(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[6] = _value;
+      #    }
+      #
+      #    return grouping[6];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingClient
+      #edit NoYes editGroupingClient(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[3] = _value;
+      #    }
+      #
+      #    return grouping[3];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingDivision
+      #edit NoYes editGroupingDivision(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[1] = _value;
+      #    }
+      #
+      #    return grouping[1];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingFunctSubgroup
+      #edit NoYes editGroupingFunctSubgroup(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[5] = _value;
+      #    }
+      #
+      #    return grouping[5];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingGoodCategory
+      #edit NoYes editGroupingGoodCategory(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[4] = _value;
+      #    }
+      #
+      #    return grouping[4];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingItemId
+      #edit NoYes editGroupingItemId(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[9] = _value;
+      #    }
+      #
+      #    return grouping[9];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingItemName
+      #edit NoYes editGroupingItemName(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[8] = _value;
+      #    }
+      #
+      #    return grouping[8];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingSector
+      #edit NoYes editGroupingSector(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[2] = _value;
+      #    }
+      #
+      #    return grouping[2];
+      #}
+    ENDSOURCE
+    SOURCE #editGroupingTrademark
+      #edit NoYes editGroupingTrademark(boolean _set, NoYes _value)
+      #{
+      #    ;
+      #    if (_set)
+      #    {
+      #        grouping[7] = _value;
+      #    }
+      #
+      #    return grouping[7];
+      #}
+    ENDSOURCE
+    SOURCE #groupingSetOnOff
+      #// "выделить все" или "Отменить выделение"
+      #public void groupingSetOnOff(NoYes _set)
+      #{
+      #    int idx;
+      #    ;
+      #
+      #    for(idx=1;idx<=9;idx++)
+      #    {
+      #        grouping[idx] = _set;
+      #    }
+      #
+      #    element.redraw();
+      #}
+    ENDSOURCE
+    SOURCE #init
+      #public void init()
+      #{
+      #    if (!element.args().caller())
+      #        throw error("@SYS90597");
+      #
+      #    caller =  element.args().caller().runbase();
+      #
+      #    super();
+      #
+      #    this.initFromCaller();
+      #
+      #
+      #}
+    ENDSOURCE
+    SOURCE #initFromCaller
+      #// инзилизация из класса вызова
+      #public void initFromCaller()
+      #{
+      #    RestOnDateFrom.dateValue(caller.parmRestOnDateFrom());
+      #    RestOnDateTo.dateValue(caller.parmRestOnDateTo());
+      #    Items.value(caller.parmListProductTableRefRecId());
+      #    Unit.selection(caller.parmStorageUnit());
+      #    Fold.value(caller.parmIsFold());
+      #    grouping = caller.parmGrouping();
+      #    dateFrom = caller.parmRestOnDateFrom();
+      #    dateTo = caller.parmRestOnDateTo();
+      #
+      #}
+    ENDSOURCE
+    SOURCE #initParmDefault
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:49:16 )
+      #void initParmDefault()
+      #{
+      #    ;
+      #    //RestOnDateSave = systemdateGet();
+      #}
+    ENDSOURCE
+    SOURCE #lastValueDataAreaId
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:49:16 )
+      #dataAreaId lastValueDataAreaId()
+      #{
+      #    return curext();
+      #}
+    ENDSOURCE
+    SOURCE #lastValueDesignName
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:49:16 )
+      #private identifierName lastValueDesignName()
+      #{
+      #    return '';
+      #}
+    ENDSOURCE
+    SOURCE #lastValueElementName
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:49:16 )
+      #private identifierName lastValueElementName()
+      #{
+      #    return this.name();
+      #}
+    ENDSOURCE
+    SOURCE #lastValueType
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:49:16 )
+      #private UtilElementType lastValueType()
+      #{
+      #    return UtilElementType::Form;
+      #}
+    ENDSOURCE
+    SOURCE #lastValueUserId
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:49:16 )
+      #private userId lastValueUserId()
+      #{
+      #    return curuserid();
+      #}
+    ENDSOURCE
+    SOURCE #pack
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:38:40 )
+      #public container pack()
+      #{
+      #    return [#CurrentVersion,#CurrentList];
+      #}
+    ENDSOURCE
+    SOURCE #runBase
+      #//AOSRunMode::Client
+      #RunBase runBase()
+      #{
+      #    return caller;
+      #}
+      #
+    ENDSOURCE
+    SOURCE #unpack
+      #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 16:39:28 )
+      #public boolean unpack(container packedClass)
+      #{
+      #    Integer     version     = conpeek(packedClass,1);
+      #
+      #    switch (version)
+      #    {
+      #        case #CurrentVersion:
+      #            [version,#CurrentList] = packedClass;
+      #            break;
+      #        default:
+      #            return false;
+      #    }
+      #
+      #    return true;
+      #}
+    ENDSOURCE
+  ENDMETHODS
+  OBJECTBANK
+    PROPERTIES
+    ENDPROPERTIES
+    
+  ENDOBJECTBANK
+  
+  REFERENCEDATASOURCES
+  ENDREFERENCEDATASOURCES
+  
+  JOINS
+  ENDJOINS
+  
+  PARTREFERENCES
+  ENDPARTREFERENCES
+  
+  DESIGN
+    PROPERTIES
+      Caption             #Динамика остатков дистрибьютор
+    ENDPROPERTIES
+    
+    CONTAINER
+      CONTROL BUTTONGROUP
+        PROPERTIES
+          Name                #BottomButtonGrp
+          Left                #Auto (right)
+          Top                 #Bottom edge
+          ElementPosition     #1431655764
+          ArrangeMethod       #Horizontal, flush right
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL BUTTONGROUP
+        PROPERTIES
+          Name                #RightButtonGrp
+          ElementPosition     #1717986916
+          HierarchyParent     #TabPageGeneral
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL BUTTONGROUP
+        PROPERTIES
+          Name                #SetOnOff
+          ElementPosition     #1968526670
+          HierarchyParent     #GrgGroup
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #dialogStartGrp
+          ElementPosition     #1288490187
+          HierarchyParent     #TabPageGeneral
+          FrameType           #None
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GgrSecond
+          ElementPosition     #1610612733
+          HierarchyParent     #GrpMain
+          Columns             #2
+          ArrangeGuide        
+            ARRAY INDEX Columns 
+              #0
+              #0
+            ENDARRAY
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrgGroup
+          ElementPosition     #954437176
+          HierarchyParent     #GgrSecond
+          FrameType           #Edged 3D
+          Caption             #@SYS333980
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrpFirst
+          ElementPosition     #1073741822
+          HierarchyParent     #GrpMain
+          Columns             #2
+          ArrangeGuide        
+            ARRAY INDEX Columns 
+              #0
+              #0
+            ENDARRAY
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrpFold
+          ElementPosition     #1789569705
+          HierarchyParent     #GgrSecond
+          FrameType           #Edged 3D
+          Caption             #@SYS78137
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrpItems
+          ElementPosition     #1610612733
+          HierarchyParent     #GrpFirst
+          FrameType           #Edged 3D
+          Caption             #@SYS303716
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrpMain
+          ElementPosition     #858993458
+          HierarchyParent     #TabPageGeneral
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrpParameters
+          ElementPosition     #1431655764
+          HierarchyParent     #GgrSecond
+          FrameType           #Edged 3D
+          Caption             #@SYS32327
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL GROUP
+        PROPERTIES
+          Name                #GrpRestOnDate
+          ElementPosition     #1073741822
+          HierarchyParent     #GrpFirst
+          FrameType           #Edged 3D
+          Caption             #@ICL5909
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL REFERENCEGROUP
+        PROPERTIES
+          Name                #Items
+          AutoDeclaration     #Yes
+          ElementPosition     #1252698792
+          HierarchyParent     #GrpItems
+          ExtendedDataType    #ListProductTableRefRecId_ICL
+          Label               #@SYS68682
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL TAB
+        PROPERTIES
+          Name                #Tab
+          ElementPosition     #715827882
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL TABPAGE
+        PROPERTIES
+          Name                #TabPageGeneral
+          ElementPosition     #1431655764
+          HierarchyParent     #Tab
+          Caption             #Разное
+          Columns             #2
+          ArrangeGuide        
+            ARRAY INDEX Columns 
+              #0
+              #0
+            ENDARRAY
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL BUTTON
+        PROPERTIES
+          Name                #SetOffAll
+          HelpText            #@ICL4153
+          ElementPosition     #1610612733
+          HierarchyParent     #SetOnOff
+          Text                #@ICL4153
+        ENDPROPERTIES
+        
+        METHODS
+          SOURCE #clicked
+            #void clicked()
+            #{
+            #    super();
+            #
+            #    element.groupingSetOnOff(NoYes::No);
+            #}
+          ENDSOURCE
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL BUTTON
+        PROPERTIES
+          Name                #SetOnAll
+          HelpText            #@ICL4154
+          ElementPosition     #1073741822
+          HierarchyParent     #SetOnOff
+          Text                #@ICL4154
+        ENDPROPERTIES
+        
+        METHODS
+          SOURCE #clicked
+            #void clicked()
+            #{
+            #    super();
+            #
+            #    element.groupingSetOnOff(NoYes::Yes);
+            #}
+          ENDSOURCE
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #BrandGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #1252698790
+          HierarchyParent     #GrgGroup
+          Label               #@ICL757
+          DataMethod          #editGroupingBrand
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #ClientGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #715827880
+          HierarchyParent     #GrgGroup
+          Label               #@SYS11779
+          DataMethod          #editGroupingClient
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #DivisionGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #357913940
+          HierarchyParent     #GrgGroup
+          Label               #@ICL472
+          DataMethod          #editGroupingDivision
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #Fold
+          AutoDeclaration     #Yes
+          ElementPosition     #1431655764
+          HierarchyParent     #GrpFold
+          Label               #@ICL5576
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #FunctSubgroupGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #1073741820
+          HierarchyParent     #GrgGroup
+          Label               #@ICL59
+          DataMethod          #editGroupingFunctSubgroup
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #GoodCategoryGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #894784850
+          HierarchyParent     #GrgGroup
+          Label               #@ICL43
+          DataMethod          #editGroupingGoodCategory
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #ItemIdGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #1789569700
+          HierarchyParent     #GrgGroup
+          Label               #@SYS89148
+          DataMethod          #editGroupingItemId
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #ItemNameGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #1610612730
+          HierarchyParent     #GrgGroup
+          Label               #@ICL5912
+          DataMethod          #editGroupingItemName
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #SectorGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #536870910
+          HierarchyParent     #GrgGroup
+          Label               #@ICL476
+          DataMethod          #editGroupingSector
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL CHECKBOX
+        PROPERTIES
+          Name                #TradeMarkGroup
+          AutoDeclaration     #Yes
+          ElementPosition     #1431655760
+          HierarchyParent     #GrgGroup
+          Label               #@MCR27269
+          DataMethod          #editGroupingTrademark
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL COMBOBOX
+        PROPERTIES
+          Name                #Unit
+          AutoDeclaration     #Yes
+          HelpText            #@ICL6063
+          ElementPosition     #1431655764
+          HierarchyParent     #GrpParameters
+          ExtendedDataType    
+            ARRAY 
+              #StorageUnitReport_ICL
+              #
+            ENDARRAY
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL COMMANDBUTTON
+        PROPERTIES
+          Name                #CommandButtonCancel
+          ElementPosition     #1610612733
+          HierarchyParent     #BottomButtonGrp
+          Command             #264
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL COMMANDBUTTON
+        PROPERTIES
+          Name                #CommandButtonOK
+          ElementPosition     #1073741822
+          HierarchyParent     #BottomButtonGrp
+          DefaultButton       #Yes
+          Command             #263
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL DATEEDIT
+        PROPERTIES
+          Name                #RestOnDateFrom
+          AutoDeclaration     #Yes
+          ElementPosition     #1073741822
+          HierarchyParent     #GrpRestOnDate
+          Label               #Начальная дата
+          ExtendedDataType    
+            ARRAY 
+              #TransDate
+              #
+            ENDARRAY
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL DATEEDIT
+        PROPERTIES
+          Name                #RestOnDateTo
+          AutoDeclaration     #Yes
+          ElementPosition     #1610612733
+          HierarchyParent     #GrpRestOnDate
+          Label               #Конечная дата
+          ExtendedDataType    
+            ARRAY 
+              #TransDate
+              #
+            ENDARRAY
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+      CONTROL STRINGEDIT
+        PROPERTIES
+          Name                #ItemName
+          ElementPosition     #1879048189
+          HierarchyParent     #GrpItems
+          DataMethod          #dispItemName
+        ENDPROPERTIES
+        
+        METHODS
+        ENDMETHODS
+      ENDCONTROL 
+      
+    ENDCONTAINER
+    
+  ENDDESIGN
+  
+  PERMISSIONS #Permissions
+    PROPERTIES
+    ENDPROPERTIES
+    
+    PERMISSIONSET #Read
+      PROPERTIES
+      ENDPROPERTIES
+      
+      FORM #Controls
+      ENDFORM
+      
+    TABLES #Tables
+    ENDTABLES
+    
+  SERVERMETHODS #Server Methods
+  ENDSERVERMETHODS
+  
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Update
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Create
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+PERMISSIONSET #Delete
+  PROPERTIES
+  ENDPROPERTIES
+  
+  FORM #Controls
+  ENDFORM
+  
+TABLES #Tables
+ENDTABLES
+
+SERVERMETHODS #Server Methods
+ENDSERVERMETHODS
+
+ASSOCIATEDFORMS #Associated Forms
+ENDASSOCIATEDFORMS
+
+ENDPERMISSIONSET
+
+ENDPERMISSIONS
+
+ENDFORM
+
+
+***Element: END

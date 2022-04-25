@@ -1,0 +1,1578 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: smmSecondSalesRemaindersData_ICL выгружен
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #smmSecondSalesRemaindersData_ICL
+    PROPERTIES
+      Name                #smmSecondSalesRemaindersData_ICL
+      RunOn               #Server
+      Origin              #{8CC27B7E-5E3C-4A75-B16C-2311C167B705}
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #addItemRangeExtends
+        #//vsn01CO_0270__VSN
+        #private void addItemRangeExtends(QueryBuildDataSource   _qbdsItem)
+        #{
+        #    QueryBuildDataSource        qbdsInventRaiting;
+        #    QueryBuildDataSource        qbdsFunctionalSubGroup;
+        #    QueryBuildDataSource        qbdsTradeMark;
+        #    QueryBuildDataSource        qbdsBrand;
+        #
+        #    if (origQuery.dataSourceTable(tableNum(InventRaiting_ICL)).enabled())
+        #    {
+        #        qbdsInventRaiting = _qbdsItem.addDataSource(tableNum(InventRaiting_ICL));
+        #        copyRange_ICL(qbdsInventRaiting, origQuery.dataSourceTable(tableNum(InventRaiting_ICL)));
+        #        qbdsInventRaiting.relations(true);
+        #        qbdsInventRaiting.joinMode(JoinMode::ExistsJoin);
+        #        qbdsInventRaiting.fetchMode(QueryFetchMode::One2One);
+        #    }
+        #
+        #    if (origQuery.dataSourceTable(tableNum(FunctionalSubGroup_ICL)).enabled())
+        #    {
+        #        qbdsFunctionalSubGroup = _qbdsItem.addDataSource(tableNum(FunctionalSubGroup_ICL));
+        #        copyRange_ICL(qbdsFunctionalSubGroup, origQuery.dataSourceTable(tableNum(FunctionalSubGroup_ICL)));
+        #        qbdsFunctionalSubGroup.relations(true);
+        #        qbdsFunctionalSubGroup.joinMode(JoinMode::ExistsJoin);
+        #        qbdsFunctionalSubGroup.fetchMode(QueryFetchMode::One2One);
+        #    }
+        #
+        #    if (origQuery.dataSourceTable(tableNum(TradeMark_ICL)).enabled())
+        #    {
+        #        qbdsTradeMark = _qbdsItem.addDataSource(tableNum(TradeMark_ICL));
+        #        copyRange_ICL(qbdsTradeMark, origQuery.dataSourceTable(tableNum(TradeMark_ICL)));
+        #        qbdsTradeMark.relations(true);
+        #        qbdsTradeMark.joinMode(JoinMode::ExistsJoin);
+        #        qbdsTradeMark.fetchMode(QueryFetchMode::One2One);
+        #    }
+        #
+        #    if (origQuery.dataSourceTable(tableNum(BrandTable_ICL)).enabled())
+        #    {
+        #        qbdsBrand = _qbdsItem.addDataSource(tableNum(BrandTable_ICL));
+        #        copyRange_ICL(qbdsBrand, origQuery.dataSourceTable(tableNum(BrandTable_ICL)));
+        #        qbdsBrand.relations(true);
+        #        qbdsBrand.joinMode(JoinMode::ExistsJoin);
+        #        qbdsBrand.fetchMode(QueryFetchMode::One2One);
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #addQueryGrouping
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 14:00:08 ) -->
+        #/*
+        #private Query addQueryGrouping(smmSecondSalesGrouping_ICL _grouping, Query _query,
+        #*/
+        #protected Query addQueryGrouping(smmSecondSalesGrouping_ICL _grouping, Query _query,
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 14:00:08 ) <--
+        #    TableId _custTableId = tableNum(CustTable), TableId _inventTableId = tableNum(InventTable))
+        #{
+        #    QueryBuildDataSource    qbdsCustTable;
+        #    QueryBuildDataSource    qbdsInventTable;
+        #    ;
+        #
+        #    if (_custTableId)
+        #    {
+        #        qbdsCustTable = _query.dataSourceTable(tableNum(CustTable));
+        #
+        #        //Дивизион
+        #        if (_grouping[#divisionGroup])
+        #        {
+        #            qbdsCustTable.addGroupByField(fieldNum(CustTable, LineOfBusinessId));
+        #            qbdsCustTable.addOrderByField(fieldNum(CustTable, LineOfBusinessId));
+        #        }
+        #        //Сектор
+        #        if (_grouping[#sectorGroup])
+        #        {
+        #            qbdsCustTable.addGroupByField(fieldNum(CustTable, SubsegmentId));
+        #            qbdsCustTable.addOrderByField(fieldNum(CustTable, SubsegmentId));
+        #        }
+        #        //Клиент
+        #        //UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 10 Окт 2016, 10:10:21 ) -->
+        #        /*
+        #        if (_grouping[#goodCategoryGroup])
+        #        */
+        #        if (_grouping[#clientGroup])
+        #        //UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 10 Окт 2016, 10:10:21 ) <--
+        #        {
+        #          //  qbdsCustTable.addGroupByField(fieldNum(CustTable, Party));
+        #            qbdsCustTable.addGroupByField(fieldNum(CustTable, AccountNum));
+        #            qbdsCustTable.addOrderByField(fieldNum(CustTable, AccountNum));
+        #        }
+        #    }
+        #
+        #    if (_inventTableId)
+        #    {
+        #        qbdsInventTable = _query.dataSourceTable(tableNum(InventTable));
+        #
+        #        //Товарная категория
+        #        if (_grouping[#goodCategoryGroup])
+        #        {
+        #            qbdsInventTable.addGroupByField(fieldNum(InventTable, InventRaitingRef_ICL));
+        #            qbdsInventTable.addOrderByField(fieldNum(InventTable, InventRaitingRef_ICL));
+        #        }
+        #        //Функциональная подгруппа
+        #        if (_grouping[#functSubgroupGroup])
+        #        {
+        #            qbdsInventTable.addGroupByField(fieldNum(InventTable, FunctionalSubGroupRef_ICL));
+        #            qbdsInventTable.addOrderByField(fieldNum(InventTable, FunctionalSubGroupRef_ICL));
+        #        }
+        #        //Бренд
+        #        if (_grouping[#BrandGroup])
+        #        {
+        #            qbdsInventTable.addGroupByField(fieldNum(InventTable, BrandRefRecId_ICL));
+        #            qbdsInventTable.addOrderByField(fieldNum(InventTable, BrandRefRecId_ICL));
+        #        }
+        #        //Торговая марка
+        #        if (_grouping[#TradeMarkGroup])
+        #        {
+        #            qbdsInventTable.addGroupByField(fieldNum(InventTable, TradeMarkRef_ICL));
+        #            qbdsInventTable.addOrderByField(fieldNum(InventTable, TradeMarkRef_ICL));
+        #        }
+        #        //Общее наименование номенклатуры
+        #        if (_grouping[#itemNameGroup])
+        #        {
+        #            qbdsInventTable.addGroupByField(fieldNum(InventTable, GeneralName_ICL));
+        #            qbdsInventTable.addOrderByField(fieldNum(InventTable, GeneralName_ICL));
+        #        }
+        #        if (_grouping[#itemIdGroup])
+        #        {
+        #            qbdsInventTable.addGroupByField(fieldNum(InventTable, ItemId));
+        #        }
+        #        qbdsInventTable.addOrderByField(fieldNum(InventTable, ItemId));
+        #    }
+        #
+        #    return _query;
+        #}
+      ENDSOURCE
+      SOURCE #calc
+        #public void calc()
+        #{
+        #    smmParametersTable = smmParametersTable::find();
+        #    //ttsBegin;
+        #    this.getData();
+        #    //ttsCommit;
+        #}
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #//VAMA, ICLr0953, Остатки на складах дистрибьюторов ( 11 Сен 2016, 19:52:37 )
+        #class smmSecondSalesRemaindersData_ICL
+        #{
+        #    TmpSmmSecondSalesRemaindersData_ICL tmpData;
+        #
+        #    smmSecondSalesGrouping_ICL      grouping;
+        #    TransDate                       restOnDate;
+        #    TransDate                       purchSalesFromDate;
+        #    TransDate                       purchSalesToDate;
+        #    NoYes                           dontShowSales;
+        #    ListProductTableRefRecId_ICL    listProductTableRefRecId;
+        #    StorageUnit_ICL                 storageUnit;
+        #    NoYes                           isFold;
+        #
+        #    smmParametersTable              smmParametersTable;
+        #
+        #    QueryRun                        queryRun;
+        #
+        #    Query                           origQuery;
+        #    UnitOfMeasureSymbol             symbolOrig;
+        #
+        #    #SmmSecondSalesRemaindersDataRep_ICL
+        #
+        #    //NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:09:41 ) -->
+        #    Range                           custAccountFiSales;
+        #    ItemId                          itemIdFiSales;
+        #    real                            col3fi, col11fi;
+        #    //NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:09:41 ) <--
+        #}
+      ENDSOURCE
+      SOURCE #getData
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 13:50:14 ) -->
+        #/*
+        #private void getData()
+        #*/
+        #protected void getData()
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 13:50:14 ) <--
+        #{
+        #    smmSecondSalesTrans_ICL smmSecondSalesTrans;
+        #    CustTable               custTable;
+        #    InventTable             inventTable;
+        #
+        #    real            col3, col5, col7, col9, col11, col15, col17;
+        #    Amount          col4, col6, col8, col10, col12,col16, col18;
+        #
+        #    InventQty       inventQty;
+        #    ;
+        #
+        #    this.getUnitSymbol();
+        #    this.updateQuery();
+        #    origQuery = new Query(queryRun.query());
+        #    this.addQueryGrouping(grouping, queryRun.query());
+        #
+        #    while(queryRun.next())
+        #    {
+        #        smmSecondSalesTrans = queryRun.get(tableNum(smmSecondSalesTrans_ICL));
+        #        custTable = queryRun.get(tableNum(CustTable));
+        #        inventTable = queryRun.get(tableNum(InventTable));
+        #
+        #        if (!(custTable.CustType_ICL == CustType_ICL::Consignee
+        #                && custTable.PurchRemainders_ICL == NoYes::No))
+        #        {
+        #            col3 = smmSecondSalesTrans.QtyRem;
+        #            col3 = UnitOfMeasureConverter::convert(
+        #                    col3,
+        #                    UnitOfMeasure::findBySymbol(smmParametersTable.SecondSalesUnitId_ICL).RecId,
+        #                    UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                    NoYes::No,
+        #                    inventTable.Product,
+        #                    NoYes::No);
+        #
+        #        }
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:24:09 ) -->
+        #        /* */
+        #        if (custTable.CustType_ICL == CustType_ICL::Consignee)
+        #        {
+        #            inventQty = this.getOnHandQty(custTable, inventTable);
+        #            col5 = UnitOfMeasureConverter::convert(
+        #                inventQty,
+        #                UnitOfMeasure::findBySymbol(inventTable.inventUnitId()).RecId,
+        #                UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                NoYes::No,
+        #                inventTable.Product,
+        #                NoYes::No);
+        #        }
+        #        else
+        #        {
+        #            col5 = 0;
+        #        }
+        #        /* */
+        #        //col5 = 0;
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:24:09 ) -->
+        #
+        #        if ((custTable.CustType_ICL == CustType_ICL::Consignee
+        #                && custTable.PurchRemainders_ICL == NoYes::No)
+        #              || (custTable.CustType_ICL != CustType_ICL::Consignee))
+        #        {
+        #            col7 = smmSecondSalesTrans.QtyRem;
+        #            col7 = UnitOfMeasureConverter::convert(
+        #                    col7,
+        #                    UnitOfMeasure::findBySymbol(smmParametersTable.SecondSalesUnitId_ICL).RecId,
+        #                    UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                    NoYes::No,
+        #                    inventTable.Product,
+        #                    NoYes::No);
+        #            col8 = smmSecondSalesTrans.AmountRemIOP;
+        #        }
+        #        else
+        #        if (custTable.CustType_ICL == CustType_ICL::Consignee
+        #            && custTable.PurchRemainders_ICL == NoYes::Yes)
+        #        {
+        #            col7 = col3;
+        #            col8 = col7 * this.getPrice(custTable, inventTable, col7);
+        #
+        #        }
+        #        else
+        #        {
+        #            col7 = col3;
+        #            col8 = col7 * this.getPrice(custTable, inventTable, col7);
+        #        }
+        #
+        #        if (custTable.CustType_ICL == CustType_ICL::Consignee
+        #                && custTable.PurchRemainders_ICL == NoYes::No)
+        #        {
+        #            col3 = (col7 - col5) > 0 ? (col7 - col5) : 0;
+        #        }
+        #
+        #        if (custTable.CustType_ICL == CustType_ICL::Consignee)
+        #        {
+        #            col4 = col3 * this.getPrice(custTable, inventTable, col3);
+        #        }
+        #        else
+        #        {
+        #            col4 = smmSecondSalesTrans.AmountRemIOP;
+        #        }
+        #
+        #
+        #        col5 = 0;
+        #
+        #        col6 = col5 * this.getPrice(custTable, inventTable, col5);
+        #
+        #        if (isFold)
+        #        {
+        #            col3 = col3 / 1000;
+        #            col5 = col5 / 1000;
+        #            col7 = col7 / 1000;
+        #            //vsn01CO_0420_ALRE_VSN -->
+        #            col4 = col4 / 1000;
+        #            col6 = col6 / 1000;
+        #            col8 = col8 / 1000;
+        #            //vsn01CO_0420_ALRE_VSN <--
+        #        }
+        #        tmpData.clear();
+        #
+        #        this.initTmpData(custTable, inventTable);
+        #
+        #        tmpData.Qty1    = col3;
+        #        tmpData.Amount1 = col4;
+        #        tmpData.Qty2    = col5;
+        #        tmpData.Amount2 = col6;
+        #        tmpData.Qty3    = col7;
+        #        tmpData.Amount3 = col8;
+        #        tmpData.Qty4    = col9;
+        #        tmpData.Amount4 = col10;
+        #        tmpData.Qty5    = col11;
+        #        tmpData.Amount5 = col12;
+        #
+        #        tmpData.Qty7    = col15;
+        #        tmpData.Amount7 = col16;
+        #        tmpData.Qty8    = col17;
+        #        tmpData.Amount8 = col18;
+        #        tmpData.insert();
+        #        //NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:27:53 ) -->
+        #        if (itemIdFiSales)
+        #        {
+        #            col3fi  += col3;
+        #            col11fi += col11;
+        #        }
+        #        //NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:27:53 ) <--
+        #
+        #    }
+        #    //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 07 Июл 2016, 17:37:47 ) -->
+        #    if (!custAccountFiSales) //vsn01CO_0285_ALRE_VSN //при планировании нужны только выкупленные остатки
+        #        this.getDataCustTable();
+        #    //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 07 Июл 2016, 17:37:47 ) <--
+        #
+        #    this.getTransferData(null, null);
+        #    if (!dontShowSales)
+        #    {
+        #        this.getShowSalesData(origQuery, null, null);
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #getDataCustTable
+        #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:24:09 )
+        #private void getDataCustTable()
+        #{
+        #    QueryBuildDataSource        qbdsCustTable;
+        #    Query                       query = new Query();
+        #    QueryRun                    qrun, qRunItem;
+        #    CustTable                   custTable;
+        #    InventTable                 inventTable;
+        #    InventLocation              inventLocation;
+        #
+        #    real                        col5, col7;
+        #    Amount                      col6, col8;
+        #
+        #    QueryBuildDataSource        qbdsrep, qbdsDim, qbdsItem, qbdsSum;
+        #    QueryBuildRange             qbr, qbrLoc, qbrItem;
+        #
+        #    Query                       targetQuery = new Query();
+        #    Query                       itemQuery = new Query();
+        #    inventSumDateTransReport    inventSumDateTransReport;
+        #    inventSumDateEngine         inventSumDateEngine;
+        #    inventDimParm               inventDimParm;
+        #
+        #    ;
+        #
+        #    qbdsRep = targetQuery.addDataSource(tableNum(InventSumDateTransReport));
+        #    qbdsDim = qbdsRep.addDataSource(tableNum(InventDim));
+        #    qbdsDim.joinMode(JoinMode::InnerJoin);
+        #    qbdsDim.addLink(fieldNum(InventSumDateTransReport, InventDimId), fieldNum(InventDim, InventDimId));
+        #    qbr = qbdsDim.addRange(fieldNum(InventDim, InventStatusId));
+        #    qbrLoc = qbdsDim.addRange(fieldNum(InventDim, InventLocationId));
+        #
+        #    inventDimParm.clear();
+        #    inventDimParm.InventStatusFlag = NoYes::Yes;
+        #    inventDimParm.InventLocationIdFlag = NoYes::Yes;
+        #
+        #    qbdsItem = itemQuery.addDataSource(tableNum(InventTable));
+        #    copyRange_ICL(qbdsItem, origQuery.dataSourceTable(tableNum(InventTable)));
+        #    this.addItemRangeExtends(qbdsItem); //vsn01CO_0270__VSN
+        #    qbdsSum = qbdsItem.addDataSource(tableNum(InventTable));
+        #    qbdsSum.relations(true);
+        #    qbdsSum.joinMode(JoinMode::ExistsJoin);
+        #    qbrItem = qbdsSum.addRange(fieldnum(InventTable, ItemId));
+        #
+        #    qbdsCustTable = query.addDataSource(tableNum(CustTable));
+        #    qbdsCustTable.addRange(fieldNum(CustTable, CustType_ICL)).value( queryValue(CustType_ICL::Consignee));
+        #    qbdsCustTable.addRange(fieldNum(CustTable, ConsignLocation_ICL)).value(SysQuery::valueNotEmptyString());
+        #    copyRange_ICL(qbdsCustTable, origQuery.dataSourceTable(tableNum(CustTable)));
+        #    this.addQueryGrouping(grouping, query, tableNum(CustTable), 0);
+        #
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, AccountNum));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, CustType_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, PurchRemainders_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InclTax));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, TaxGroup));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, ConsignLocation_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, PriceGroup));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InventLocation));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InventSiteId));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, Currency));
+        #
+        #    qrun = new QueryRun(query);
+        #    while(qrun.next())
+        #    {
+        #        custTable = qrun.get(tableNum(CustTable));
+        #
+        #        select * from inventLocation where inventLocation.InventLocationId == CustTable.ConsignLocation_ICL;
+        #        qbr.value(inventLocation.DefaultStatusId);
+        #        qbrLoc.value(custTable.ConsignLocation_ICL);
+        #
+        #        delete_from inventSumDateTransReport;
+        #
+        #        inventSumDateTransReport.clear();
+        #        inventSumDateEngine = InventSumDateEngine::newParameters(restOnDate, inventDimParm, false, targetQuery);
+        #        inventSumDateEngine.parmInventSumDateTransReport(inventSumDateTransReport);
+        #        inventSumDateEngine.calcData();
+        #        inventSumDateTransReport = inventSumDateEngine.parmInventSumDateTransReport();
+        #        while select sum(postedQty), sum(receivedQty), sum(deductedQty), sum(pickedQty), sum(registeredQty), ItemId
+        #            from inventSumDateTransReport group by ItemId order by  ItemId
+        #        {
+        #            if (!inventSumDateTransReport.PostedQty && !inventSumDateTransReport.ReceivedQty && !inventSumDateTransReport.DeductedQty &&
+        #                !inventSumDateTransReport.PickedQty && !inventSumDateTransReport.RegisteredQty)
+        #                continue;
+        #            qbrItem.value(inventSumDateTransReport.ItemId);
+        #            qrunItem = new QueryRun(ItemQuery);
+        #            qrunItem.next();
+        #            inventTable = qrunItem.get(tableNum(InventTable));
+        #            if (!inventTable.ItemId)
+        #                continue;
+        #            col5 = inventSumDateTransReport.postedQty + inventSumDateTransReport.ReceivedQty - inventSumDateTransReport.DeductedQty
+        #            - inventSumDateTransReport.PickedQty + inventSumDateTransReport.RegisteredQty;
+        #
+        #            col5 = UnitOfMeasureConverter::convert(
+        #                col5,
+        #                UnitOfMeasure::findBySymbol(inventTable.inventUnitId()).RecId,
+        #                UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                NoYes::No,
+        #                inventTable.Product,
+        #                NoYes::No,
+        #                true);
+        #
+        #            col6 = col5 * this.getPrice(custTable, inventTable, col5);
+        #            if (custTable.PurchRemainders_ICL == NoYes::Yes)
+        #            {
+        #                col7  = col5;
+        #                col8  = col6;
+        #            }
+        #            else
+        #            {
+        #                col7  = 0;
+        #                col8  = 0;
+        #            }
+        #
+        #
+        #            if (isFold)
+        #            {
+        #                col5 = col5 / 1000;
+        #                col7 = col7 / 1000;
+        #                //vsn01CO_0420_ALRE_VSN -->
+        #                col6 = col6 / 1000;
+        #                col8 = col8 / 1000;
+        #                //vsn01CO_0420_ALRE_VSN <--
+        #            }
+        #            if (col5)
+        #                this.updateConsigData(custTable, inventTable, [col5, col6, col7, col8]);
+        #        }
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #getFisales
+        #//NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:27:53 )
+        #public container getFisales()
+        #{
+        #    return [col3fi, col11fi];
+        #}
+      ENDSOURCE
+      SOURCE #getInventTransferLineQty
+        #private Qty getInventTransferLineQty(InventTransferLine _inventTransferLine)
+        #{
+        #    Qty                 qty, qtyReceipt, qtyIssue;
+        #    InventTrans         inventTrans;
+        #    InventTransOrigin   inventTransOrigin;
+        #    InventLocation      inventLocationTransit;
+        #    InventDim           inventDim;
+        #    ;
+        #
+        #    select firstOnly InventLocationId from inventLocationTransit
+        #        where inventLocationTransit.InventLocationType == InventLocationType::Transit;
+        #
+        #    select sum(qty) from inventTrans
+        #        where inventTrans.StatusReceipt == StatusReceipt::Purchased
+        #            && inventTrans.DatePhysical <= restOnDate
+        #            && inventTrans.ItemId == _inventTransferLine.ItemId
+        #        join TableId from inventTransOrigin
+        #            where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+        #                && inventTransOrigin.ReferenceId == _inventTransferLine.TransferId
+        #        join TableId from inventDim
+        #            where inventDim.inventDimId == inventTrans.inventDimId
+        #                && inventDim.InventLocationId == inventLocationTransit.InventLocationId;
+        #
+        #    qtyReceipt = inventTrans.Qty;
+        #
+        #    select sum(qty) from inventTrans
+        #        where inventTrans.StatusIssue == StatusIssue::Sold
+        #            && inventTrans.DatePhysical <= restOnDate
+        #            && inventTrans.ItemId == _inventTransferLine.ItemId
+        #        join TableId from inventTransOrigin
+        #            where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+        #                && inventTransOrigin.ReferenceId == _inventTransferLine.TransferId
+        #        join TableId from inventDim
+        #            where inventDim.inventDimId == inventTrans.inventDimId
+        #                && inventDim.InventLocationId == inventLocationTransit.InventLocationId;
+        #
+        #    qtyIssue = -inventTrans.Qty;
+        #
+        #    qty = qtyReceipt - qtyIssue;
+        #
+        #    qty = UnitOfMeasureConverter::convert(
+        #        qty,
+        #        UnitOfMeasure::findBySymbol(_inventTransferLine.inventTable_IN().inventUnitId()).RecId,
+        #        UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #        NoYes::No,
+        #        _inventTransferLine.inventTable_IN().Product,
+        #        NoYes::No,
+        #        true);
+        #
+        #    return qty;
+        #}
+      ENDSOURCE
+      SOURCE #getOnHandQty
+        #private InventQty getOnHandQty(CustTable _custTable, InventTable _inventTable)
+        #{
+        #    InventQty       inventQty;
+        #    InventDim       inventDim;
+        #    InventDimParm   inventDimParm;
+        #    InventLocation  inventLocation;
+        #    ;
+        #
+        #    inventLocation = InventLocation::find(_custTable.ConsignLocation_ICL);
+        #
+        #    inventDim.InventLocationId  = inventLocation.InventLocationId;
+        #    inventDim.InventStatusId    = inventLocation.DefaultStatusId;
+        #
+        #    inventDim = inventDim::findOrCreate(inventDim);
+        #    inventDimParm.initFromInventDim(inventDim);
+        #
+        #    inventQty = InventSumDatePhysicalDim::onHandQty(
+        #        restOnDate,
+        #        _inventTable.ItemId,
+        #        inventDim,
+        #        inventDimParm);
+        #
+        #    return inventQty;
+        #}
+      ENDSOURCE
+      SOURCE #getPrice
+        #private Amount getPrice(CustTable _custTable, InventTable _inventTable, Qty _qty)
+        #{
+        #    Amount              taxplusAmount;
+        #    PriceDisc_Price     priceDisc_Price;
+        #    PriceCur            priceCur;
+        #    Percent             percent;
+        #    InventDim           inventDim;
+        #    PriceDisc_LineDisc  priceDisc_LineDisc = PriceDisc_LineDisc::construct();
+        #    ;
+        #
+        #    if (custAccountFiSales) //vsn01CO_0285_ALRE_VSN
+        #        return 0;
+        #
+        #    inventDim.configId          =   _inventTable.StandardConfigId;
+        #    inventDim.InventLocationId  =   _custTable.InventLocation;
+        #    inventDim.InventSiteId      =   _custTable.InventSiteId;
+        #
+        #    priceDisc_Price =   priceDisc_Price::construct();
+        #    priceDisc_Price.parmModuleType(ModuleInventPurchSales::Sales);
+        #    priceDisc_Price.parmItemId(_inventTable.ItemId);
+        #    priceDisc_Price.parmInventDim(inventDim);
+        #    priceDisc_Price.parmPriceDate(restOnDate);
+        #    priceDisc_Price.parmQty(_qty);
+        #    priceDisc_Price.parmCurrencyCode(_custTable.Currency);
+        #    priceDisc_Price.parmAccountNum(_custTable.AccountNum);
+        #    priceDisc_Price.parmUnitID(symbolOrig);
+        #    priceDisc_Price.parmPriceGroupId(_custTable.PriceGroup);
+        #    priceCur    =   priceDisc_price.price();
+        #
+        #    priceDisc_LineDisc.parmAccountNum(_custTable.AccountNum);
+        #    priceDisc_LineDisc.parmCurrencyCode(_custTable.Currency);
+        #    priceDisc_LineDisc.parmDiscDate(restOnDate);
+        #    priceDisc_LineDisc.parmInventDim(inventDim);
+        #    priceDisc_LineDisc.parmItemId(_inventTable.ItemId);
+        #    priceDisc_LineDisc.parmModuleType(ModuleInventPurchSales::Sales);
+        #    priceDisc_LineDisc.parmQty(_qty);
+        #    priceDisc_LineDisc.parmUnitID(symbolOrig);
+        #    //без следующей строки скидка не находится
+        #    priceDisc_LineDisc.parmItemLineDiscCode(InventTable::find(_inventTable.ItemId).inventTableModuleSales().LineDisc); //vsn01CO_0325_ALRE_VSN, перенёс сюда 24.08.2020 (afomiche)
+        #    if (!priceDisc_LineDisc.lineDiscFound())
+        #    {
+        #        priceDisc_LineDisc.findLineDiscAgreement();
+        #    }
+        #    percent =   priceDisc_LineDisc.discPct();
+        #    priceCur    =   priceCur    -   (priceCur/100)*percent;
+        #    taxPlusAmount   =   Tax::calcTaxAmount(_custTable.TaxGroup,
+        #                                           _inventTable.salesTaxItemGroupId(),
+        #                                           restOnDate,
+        #                                           _custTable.Currency,
+        #                                           priceCur,
+        #                                           TaxModuleType::SalesInvoice);
+        #    if (!_custTable.InclTax)
+        #        return  priceCur + taxplusAmount;
+        #    else
+        #        return  priceCur;
+        #    return priceCur;
+        #}
+      ENDSOURCE
+      SOURCE #getShowSalesData
+        #private container getShowSalesData(Query _origQuery, InventTable _inventTable, CustTable _custTable)
+        #{
+        #    Query                   qShowSales = new Query(_origQuery);
+        #    QueryBuildDataSource    qbdsSecondSalesTrans, qbdsCustTable, qbdsInventTable;
+        #    QueryRun                qrShowSales;
+        #
+        #    smmSecondSalesTrans_ICL smmSecondSalesTrans;
+        #    InventTable             inventTable;
+        #    CustTable               custTable;
+        #
+        #    real                    col15, col17;
+        #    Amount                  col16, col18;
+        #
+        #    int                     d1;
+        #    real                    d2;
+        #
+        #    TransDate               transDate;
+        #    int                     days;
+        #    int                     mth;
+        #    ;
+        #
+        #    d1 = purchSalesToDate - purchSalesFromDate + 1;
+        #    transDate = purchSalesFromDate;
+        #    //vsn01CO_0421_ALRE_VSN -->
+        #    //while(mthOfYr(transDate) <= mthOfYr(purchSalesToDate))
+        #    while(mthOfYr(transDate) <= mthOfYr(purchSalesToDate) + 12 * (year(purchSalesToDate) - year(transDate)))
+        #    //vsn01CO_0421_ALRE_VSN <--
+        #    {
+        #        days += dayOfMth(dateEndMth(transDate));
+        #        mth++;
+        #
+        #        transDate = dateMthFwd(transDate, 1);
+        #    }
+        #    d2 = days / mth;
+        #
+        #    qbdsSecondSalesTrans = qShowSales.dataSourceTable(tableNum(smmSecondSalesTrans_ICL));
+        #    qbdsSecondSalesTrans.clearRange(fieldNum(smmSecondSalesTrans_ICL, BeginDate));
+        #    qbdsSecondSalesTrans.clearRange(fieldNum(smmSecondSalesTrans_ICL, EndDate));
+        #
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, BeginDate)).value(
+        #        strFmt("%1..", queryValue(purchSalesFromDate)));
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, EndDate)).value(
+        #        strFmt("..%1", queryValue(purchSalesToDate)));
+        #
+        #    qbdsSecondSalesTrans.addSelectionField(fieldNum(smmSecondSalesTrans_ICL, Qty), SelectionField::Sum);
+        #    qbdsSecondSalesTrans.addSelectionField(fieldNum(smmSecondSalesTrans_ICL, AmountIOP), SelectionField::Sum);
+        #
+        #    qbdsCustTable = qShowSales.dataSourceTable(tableNum(CustTable));
+        #    if (_custTable)
+        #    {
+        #        qbdsCustTable.clearRange(fieldNum(custTable, AccountNum));
+        #        SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(custTable, AccountNum)).value(_custTable.AccountNum);
+        #        qbdsCustTable.clearRange(fieldNum(custTable, LineOfBusinessId));
+        #        SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(custTable, LineOfBusinessId)).value(_custTable.LineOfBusinessId);
+        #        qbdsCustTable.clearRange(fieldNum(custTable, SubSegmentId));
+        #        SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(custTable, SubSegmentId)).value(_custTable.SubsegmentId);
+        #    }
+        #    else
+        #    {
+        #        this.addQueryGrouping(grouping, qShowSales, tableNum(CustTable), 0);
+        #    }
+        #
+        #    qbdsInventTable = qShowSales.dataSourceTable(tableNum(InventTable));
+        #    if (_inventTable)
+        #    {
+        #        qbdsInventTable.clearRange(fieldNum(InventTable, InventRaitingRef_ICL));
+        #        SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, InventRaitingRef_ICL)).value(SysQuery::value(_inventTable.InventRaitingRef_ICL));
+        #        qbdsInventTable.clearRange(fieldNum(InventTable, FunctionalSubGroupRef_ICL));
+        #        SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, FunctionalSubGroupRef_ICL)).value(SysQuery::value(_inventTable.FunctionalSubGroupRef_ICL));
+        #        qbdsInventTable.clearRange(fieldNum(InventTable, BrandRefRecId_ICL));
+        #        SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, BrandRefRecId_ICL)).value(SysQuery::value(_inventTable.BrandRefRecId_ICL));
+        #        qbdsInventTable.clearRange(fieldNum(InventTable, TradeMarkRef_ICL));
+        #        SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, TradeMarkRef_ICL)).value(SysQuery::value(_inventTable.TradeMarkRef_ICL));
+        #        qbdsInventTable.clearRange(fieldNum(InventTable, GeneralName_ICL));
+        #        SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, GeneralName_ICL)).value(SysQuery::value(_inventTable.GeneralName_ICL));
+        #        qbdsInventTable.clearRange(fieldNum(InventTable, ItemId));
+        #        SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, ItemId)).value(SysQuery::value(_inventTable.ItemId));
+        #    }
+        #    else
+        #    {
+        #        this.addQueryGrouping(grouping, qShowSales, 0, tableNum(InventTable));
+        #    }
+        #
+        #    qrShowSales = new QueryRun(qShowSales);
+        #    while(qrShowSales.next())
+        #    {
+        #        smmSecondSalesTrans = qrShowSales.get(tableNum(smmSecondSalesTrans_ICL));
+        #        custTable           = qrShowSales.get(tableNum(CustTable));
+        #        inventTable         = qrShowSales.get(tableNum(InventTable));
+        #        col15 = smmSecondSalesTrans.Qty / d1 * d2;
+        #        col15 = UnitOfMeasureConverter::convert(
+        #            col15,
+        #            UnitOfMeasure::findBySymbol(smmParametersTable.SecondSalesUnitId_ICL).RecId,
+        #            UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #            NoYes::No,
+        #            inventTable.Product,
+        #            NoYes::No,
+        #            true);
+        #        //col17 = smmSecondSalesTrans.Qty / d1;
+        #        col17 = col15 / d2;
+        #
+        #        col16 = smmSecondSalesTrans.AmountIOP / d1 * d2;
+        #        col18 = smmSecondSalesTrans.AmountIOP / d1;
+        #
+        #        if (isFold)
+        #        {
+        #            col15 = col15 / 1000;
+        #            col17 = col17 / 1000;
+        #            //vsn01CO_0420_ALRE_VSN -->
+        #            col16 = col16 / 1000;
+        #            col18 = col18 / 1000;
+        #            //vsn01CO_0420_ALRE_VSN <--
+        #        }
+        #
+        #        this.updateTransferData(custTable, inventTable, conNull(), [col15, col16, col17, col18]);
+        #    }
+        #
+        #    return [col15, col16, col17, col18];
+        #}
+      ENDSOURCE
+      SOURCE #getTmpData
+        #public TmpSmmSecondSalesRemaindersData_ICL getTmpData()
+        #{
+        #    return tmpData;
+        #}
+      ENDSOURCE
+      SOURCE #getTransferData
+        #private container getTransferData(InventTable _inventTable, CustTable _custTable)
+        #{
+        #    container               con;
+        #    Query                   queryTransfer = new Query();
+        #    QueryBuildDataSource    qbdsTransportOrder, qbdsCustTable;
+        #    QueryRun                qrTransfer;
+        #
+        #    TransportOrder_ICL      transportOrderMain;
+        #    TransportOrder_ICL      transportOrder;
+        #    CustTable               custTable;
+        #
+        #    Qty                     col9, col11, col9_1, col11_1, col9_2, col11_2;
+        #    Amount                  col10, col12, col10_1, col12_1, col10_2, col12_2;
+        #    boolean                 getTransferDataByNumOrder; //vsn01CO_0270__VSN
+        #    ;
+        #
+        #
+        #    qbdsTransportOrder = queryTransfer.addDataSource(tableNum(TransportOrder_ICL));
+        #    qbdsTransportOrder.addRange(fieldNum(TransportOrder_ICL, ContractorType)).value(strFmt("%1,%2",
+        #        queryValue(ContractorType_ICL::Client), queryValue(ContractorType_ICL::Transfer)));
+        #    qbdsTransportOrder.addGroupByField(fieldNum(TransportOrder_ICL, MainTransportOrderId));
+        #    qbdsTransportOrder.addGroupByField(fieldNum(TransportOrder_ICL, DlvFactDate));
+        #    qbdsTransportOrder.addGroupByField(fieldNum(TransportOrder_ICL, NumOrder));
+        #    qbdsTransportOrder.addGroupByField(fieldNum(TransportOrder_ICL, ContractorType));
+        #
+        #    qbdsCustTable = qbdsTransportOrder.addDataSource(tableNum(CustTable));
+        #    qbdsCustTable.relations(false);
+        #    //vsn01CO_0420_ALRE_VSN -->
+        #    //qbdsCustTable.addLink(fieldNum(TransportOrder_ICL, PayerAccount), fieldNum(CustTable, AccountNum));
+        #    qbdsCustTable.addLink(fieldNum(TransportOrder_ICL, Account), fieldNum(CustTable, AccountNum));
+        #    //vsn01CO_0420_ALRE_VSN <--
+        #    qbdsCustTable.joinMode(JoinMode::InnerJoin);
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, AccountNum));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, CustType_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, PurchRemainders_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InclTax));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, TaxGroup));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, ConsignLocation_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, PriceGroup));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InventLocation));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InventSiteId));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, Currency));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, OldAccountNum_ICL)); //vsn01CO_0420_ALRE_VSN
+        #
+        #    copyRange_ICL(qbdsCustTable, origQuery.dataSourceTable(tableNum(CustTable)));
+        #    if (_custTable)
+        #    {
+        #        qbdsCustTable.clearRange(fieldNum(custTable, AccountNum));
+        #        SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(custTable, AccountNum)).value(_custTable.AccountNum);
+        #        qbdsCustTable.clearRange(fieldNum(custTable, LineOfBusinessId));
+        #        SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(custTable, LineOfBusinessId)).value(_custTable.LineOfBusinessId);
+        #        qbdsCustTable.clearRange(fieldNum(custTable, SubSegmentId));
+        #        SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(custTable, SubSegmentId)).value(_custTable.SubsegmentId);
+        #    }
+        #    else
+        #    {
+        #        this.addQueryGrouping(grouping, queryTransfer, tableNum(CustTable), 0);
+        #    }
+        #    qbdsCustTable.addRange(fieldNum(CustTable, GetSecondarySales_ICL)).value(SysQuery::value(NoYes::Yes)); //vsn01CO_0270__VSN
+        #
+        #    qrTransfer = new QueryRun(queryTransfer);
+        #    while(qrTransfer.next())
+        #    {
+        #        col9_1 = 0;
+        #        col10_1 = 0;
+        #        col11_1 = 0;
+        #        col12_1 = 0;
+        #        col9_2 = 0;
+        #        col10_2 = 0;
+        #        col11_2 = 0;
+        #        col12_2 = 0;
+        #
+        #        transportOrderMain = qrTransfer.get(tableNum(TransportOrder_ICL));
+        #        custTable          = qrTransfer.get(tableNum(CustTable));
+        #        //vsn01CO_0420_ALRE_VSN -->
+        #        if (custTable.AccountNum != custTable.OldAccountNum_ICL)
+        #            custTable = CustTable::find(custTable.OldAccountNum_ICL);
+        #        //vsn01CO_0420_ALRE_VSN <--
+        #        //vsn01CO_0270__VSN -->
+        #        /*
+        #        if (!transportOrderMain.MainTransportOrderId)
+        #        {
+        #            if (!transportOrderMain.DlvFactDate || transportOrderMain.DlvFactDate > restOnDate)
+        #            {
+        #                [col9_1, col10_1, col11_1, col12_1] = this.getTransferDataByNumOrder(transportOrderMain, custTable, _inventTable);
+        #            }
+        #        }
+        #        else
+        #        {
+        #            select * from transportOrder
+        #                where transportOrder.TransportOrderId == transportOrderMain.MainTransportOrderId;
+        #            if (transportOrder
+        #                && (!transportOrder.DlvFactDate || transportOrder.DlvFactDate > restOnDate))
+        #            {
+        #                [col9_1, col10_1, col11_1, col12_1] = this.getTransferDataByNumOrder(transportOrderMain, custTable, _inventTable);
+        #            }
+        #        }
+        #        */
+        #        getTransferDataByNumOrder = false;
+        #        if (!transportOrderMain.DlvFactDate || transportOrderMain.DlvFactDate > restOnDate)
+        #            getTransferDataByNumOrder = true;
+        #        if (!transportOrderMain.DlvFactDate && transportOrderMain.MainTransportOrderId)
+        #        {
+        #            select firstonly RecId, DlvFactDate from transportOrder
+        #                where transportOrder.TransportOrderId == transportOrderMain.MainTransportOrderId;
+        #            if (transportOrder.DlvFactDate && transportOrder.DlvFactDate <= restOnDate)
+        #            {
+        #                getTransferDataByNumOrder = false;
+        #            }
+        #        }
+        #        if (getTransferDataByNumOrder)
+        #            [col9_1, col10_1, col11_1, col12_1] = this.getTransferDataByNumOrder(transportOrderMain, custTable, _inventTable);
+        #        //vsn01CO_0270__VSN <--
+        #
+        #        col9 = col9_1 + col9_2;
+        #        col10 = col10_1 + col10_2;
+        #        col11 = col11_1 + col11_2;
+        #        col12 = col12_1 + col12_2;
+        #    }
+        #
+        #    con = [col9,col10,col11,col12];
+        #
+        #    return con;
+        #}
+      ENDSOURCE
+      SOURCE #getTransferDataByNumOrder
+        #private container getTransferDataByNumOrder(TransportOrder_ICL _transportOrder, CustTable _custTable, InventTable _inventTable)
+        #{
+        #    Query                   qSales = new Query();
+        #    QueryRun                qrSales;
+        #    QueryBuildDataSource    qbdsSalesLine;
+        #    Query                   qInventTransfer = new Query();
+        #    QueryRun                qrInventTransfer;
+        #    QueryBuildDataSource    qbdsInventTransferLine;
+        #    QueryBuildDataSource    qbdsInventTable;
+        #    QueryBuildDataSource    qbds;
+        #    //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:24:09 ) -->
+        #    InventTrans             inventTrans;
+        #    CustInvoiceTrans        CustInvoiceTrans;
+        #    InventTransOrigin       inventTransOrigin;
+        #    InventDim               inventDim;
+        #    InventTransferTable     inventTransferTable;
+        #    //SalesLine               salesLine;
+        #    //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:24:09 ) <--
+        #
+        #    InventTransferLine      inventTransferLine;
+        #    InventTable             inventTable;
+        #
+        #    real                        col9, col11;
+        #    Amount                      col10, col12;
+        #    ;
+        #
+        #    if (_transportOrder.ContractorType == ContractorType_ICL::Client)
+        #    {
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 03 Июл 2016, 22:23:21 ) -->
+        #        /*
+        #        qbdsSalesLine = qSales.addDataSource(tableNum(SalesLine));
+        #        qbdsSalesLine.addRange(fieldNum(SalesLine, SalesId)).value(_transportOrder.NumOrder);
+        #        qbdsSalesLine.addSelectionField(fieldNum(SalesLine, SalesQty), SelectionField::Sum);
+        #        qbdsSalesLine.addGroupByField(fieldNum(SalesLine, ItemId));
+        #        qbdsSalesLine.addGroupByField(fieldNum(SalesLine, SalesUnit));
+        #        qbdsInventTable = qbdsSalesLine.addDataSource(tableNum(InventTable));
+        #        */
+        #        qbdsSalesLine = qSales.addDataSource(tableNum(CustInvoiceTrans));
+        #        qbdsSalesline.addRange(fieldNum(CustInvoiceTrans, InvoiceDate)).value(strFmt('..%1', queryValue(restOnDate)));
+        #        qbdsSalesLine.addRange(fieldNum(CustInvoiceTrans, SalesId)).value(_transportOrder.NumOrder);
+        #        qbdsSalesLine.addSelectionField(fieldNum(CustInvoiceTrans, Qty), SelectionField::Sum);
+        #        qbdsSalesLine.addGroupByField(fieldNum(CustInvoiceTrans, ItemId));
+        #        qbdsSalesLine.addGroupByField(fieldNum(CustInvoiceTrans, SalesUnit));
+        #        qbdsInventTable = qbdsSalesLine.addDataSource(tableNum(InventTable));
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 03 Июл 2016, 22:23:21 ) <--
+        #        qbdsInventTable.relations(true);
+        #        qbdsInventTable.joinMode(JoinMode::InnerJoin);
+        #        qbdsInventTable.addGroupByField(fieldNum(InventTable, ItemId));
+        #        qbdsInventTable.addGroupByField(fieldNum(InventTable, Product));
+        #        qbdsInventTable.addGroupByField(fieldNum(InventTable, StandardConfigId));
+        #        copyRange_ICL(qbdsInventTable, origQuery.dataSourceTable(tableNum(InventTable)));
+        #        this.addItemRangeExtends(qbdsInventTable); //vsn01CO_0270__VSN
+        #
+        #        if (_inventTable)
+        #        {
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, InventRaitingRef_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, InventRaitingRef_ICL)).value(SysQuery::value(_inventTable.InventRaitingRef_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, FunctionalSubGroupRef_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, FunctionalSubGroupRef_ICL)).value(SysQuery::value(_inventTable.FunctionalSubGroupRef_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, BrandRefRecId_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, BrandRefRecId_ICL)).value(SysQuery::value(_inventTable.BrandRefRecId_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, TradeMarkRef_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, TradeMarkRef_ICL)).value(SysQuery::value(_inventTable.TradeMarkRef_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, GeneralName_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, GeneralName_ICL)).value(SysQuery::value(_inventTable.GeneralName_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, ItemId));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, ItemId)).value(SysQuery::value(_inventTable.ItemId));
+        #        }
+        #        else
+        #        {
+        #            this.addQueryGrouping(grouping, qSales, 0, tableNum(InventTable));
+        #        }
+        #
+        #        if (listProductTableRefRecId)
+        #        {
+        #            qbds = qbdsInventTable.addDataSource(tableNum(ReportLineInventTableList_ICL));
+        #            qbds.relations(true);
+        #            qbds.joinMode(JoinMode::ExistsJoin);
+        #
+        #            qbds = qbds.addDataSource(tableNum(ListProductTable_ICL));
+        #            qbds.relations(true);
+        #            qbds.joinMode(JoinMode::ExistsJoin);
+        #            qbds.addRange(fieldNum(ListProductTable_ICL, RecId)).value(queryValue(listProductTableRefRecId));
+        #        }
+        #
+        #        qrSales = new QueryRun(qSales);
+        #        while(qrSales.next())
+        #        {
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 03 Июл 2016, 22:35:24 ) -->
+        #            /*
+        #            salesLine = qrSales.get(tableNum(SalesLine));
+        #            */
+        #            custInvoiceTrans = qrSales.get(tableNum(CustInvoiceTrans));
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 03 Июл 2016, 22:35:24 ) <--
+        #
+        #            inventTable = qrSales.get(tableNum(InventTable));
+        #
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 03 Июл 2016, 22:38:14 ) -->
+        #            /*
+        #            col9 = salesLine.SalesQty;
+        #
+        #            col9 = UnitOfMeasureConverter::convert(
+        #                col9,
+        #                UnitOfMeasure::findBySymbol(salesLine.SalesUnit).RecId,
+        #                UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                NoYes::No,
+        #                inventTable.Product,
+        #                NoYes::No);
+        #            */
+        #            col9 = UnitOfMeasureConverter::convert(
+        #                CustInvoiceTrans.Qty,
+        #                UnitOfMeasure::findBySymbol(CustInvoiceTrans.SalesUnit).RecId,
+        #                UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                NoYes::No,
+        #                inventTable.Product,
+        #                NoYes::No,
+        #                true);
+        #
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 03 Июл 2016, 22:38:14 ) <--
+        #
+        #            col11 = col9;
+        #            col10 = col9 * this.getPrice(_custTable, inventTable, col9);
+        #            col12 = col11 * this.getPrice(_custTable, inventTable, col11);
+        #
+        #            if (isFold)
+        #            {
+        #                col9 = col9 / 1000;
+        #                col11 = col11 / 1000;
+        #                //vsn01CO_0420_ALRE_VSN -->
+        #                col10 = col10 / 1000;
+        #                col12 = col12 / 1000;
+        #                //vsn01CO_0420_ALRE_VSN <--
+        #            }
+        #
+        #            this.updateTransferData(_custTable, inventTable, [col9, col10, col11, col12]);
+        #        }
+        #    }
+        #    else
+        #    {
+        #        qbdsInventTransferLine = qInventTransfer.addDataSource(tableNum(InventTransferLine));
+        #        qbdsInventTransferLine.addRange(fieldNum(InventTransferLine, TransferId)).value(_transportOrder.NumOrder);
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:21:23 ) -->
+        #        qbdsInventTransferLine.addRange(fieldNum(InventTransferLine, QtyShipped)).value(sysquery::valueNot(0));
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:21:23 ) <--
+        #        qbdsInventTransferLine.addSelectionField(fieldnum(InventTransferLine, QtyTransfer), SelectionField::Sum);
+        #        qbdsInventTransferLine.addGroupByField(fieldNum(InventTransferLine, InventTransId));
+        #        qbdsInventTransferLine.addGroupByField(fieldNum(InventTransferLine, ItemId));
+        #        qbdsInventTransferLine.addGroupByField(fieldNum(InventTransferLine, TransferId));
+        #        qbdsInventTable = qbdsInventTransferLine.addDataSource(tableNum(InventTable));
+        #        qbdsInventTable.relations(true);
+        #        qbdsInventTable.joinMode(JoinMode::InnerJoin);
+        #        qbdsInventTable.addGroupByField(fieldNum(InventTable, ItemId));
+        #        qbdsInventTable.addGroupByField(fieldNum(InventTable, Product));
+        #        qbdsInventTable.addGroupByField(fieldNum(InventTable, StandardConfigId));
+        #        copyRange_ICL(qbdsInventTable, origQuery.dataSourceTable(tableNum(InventTable)));
+        #        this.addItemRangeExtends(qbdsInventTable); //vsn01CO_0270__VSN
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:26:54 ) -->
+        #        /*
+        #        qbdsInventTrans = qbdsInventTransferLine.addDataSource(tableNum(InventTrans));
+        #        qbdsInventTrans.joinMode(JoinMode::InnerJoin);
+        #        qbdsInventTrans.addRange(fieldNum(InventTrans, StatusIssue)).value(sysquery::value(StatusIssue::Sold));
+        #        qbdsInventTrans.addRange(fieldNum(InventTrans, DatePhysical)).value(strFmt("..%1", queryValue(restOnDate)));
+        #        */
+        #        //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:26:54 ) <--
+        #
+        #        if (_inventTable)
+        #        {
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, InventRaitingRef_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, InventRaitingRef_ICL)).value(SysQuery::value(_inventTable.InventRaitingRef_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, FunctionalSubGroupRef_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, FunctionalSubGroupRef_ICL)).value(SysQuery::value(_inventTable.FunctionalSubGroupRef_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, BrandRefRecId_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, BrandRefRecId_ICL)).value(SysQuery::value(_inventTable.BrandRefRecId_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, TradeMarkRef_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, TradeMarkRef_ICL)).value(SysQuery::value(_inventTable.TradeMarkRef_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, GeneralName_ICL));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, GeneralName_ICL)).value(SysQuery::value(_inventTable.GeneralName_ICL));
+        #            qbdsInventTable.clearRange(fieldNum(InventTable, ItemId));
+        #            SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, ItemId)).value(SysQuery::value(_inventTable.ItemId));
+        #        }
+        #        else
+        #        {
+        #            this.addQueryGrouping(grouping, qInventTransfer, 0, tableNum(InventTable));
+        #        }
+        #
+        #        if (listProductTableRefRecId)
+        #        {
+        #            qbds = qbdsInventTable.addDataSource(tableNum(ReportLineInventTableList_ICL));
+        #            qbds.relations(true);
+        #            qbds.joinMode(JoinMode::ExistsJoin);
+        #
+        #            qbds = qbds.addDataSource(tableNum(ListProductTable_ICL));
+        #            qbds.relations(true);
+        #            qbds.joinMode(JoinMode::ExistsJoin);
+        #            qbds.addRange(fieldNum(ListProductTable_ICL, RecId)).value(queryValue(listProductTableRefRecId));
+        #        }
+        #
+        #        qrInventTransfer = new QueryRun(qInventTransfer);
+        #        while(qrInventTransfer.next())
+        #        {
+        #            inventTransferLine = qrInventTransfer.get(tableNum(InventTransferLine));
+        #            inventTable = qrInventTransfer.get(tableNum(InventTable));
+        #            col9 = this.getInventTransferLineQty(inventTransferLine);
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:26:54 ) -->
+        #            /*
+        #            col11 = invetTransferLine.QtyTransfer;
+        #            */
+        #            inventTransferTable = inventTransferTable::find(inventTransferLine.TransferId);
+        #            /*  14 Июл 2016, 09:28:45
+        #            select sum(qty) from inventTrans
+        #                where (inventTrans.StatusIssue == StatusIssue::Sold || inventTrans.StatusReceipt == StatusReceipt::Purchased)
+        #                    && inventTrans.DatePhysical <= restOnDate
+        #                    && inventTrans.ItemId == inventTransferLine.ItemId
+        #                join TableId from inventTransOrigin
+        #                where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+        #                    && inventTransOrigin.ReferenceId == inventTransferLine.TransferId
+        #                join TableId from inventDim
+        #                where inventDim.inventDimId == inventTrans.inventDimId
+        #                    && inventDim.InventLocationId == inventTransferTable.InventLocationIdFrom;
+        #
+        #            col11 = inventTrans.Qty;
+        #            */
+        #            select sum(qty) from inventTrans
+        #                where inventTrans.StatusReceipt == StatusReceipt::Purchased
+        #                    && inventTrans.DatePhysical <= restOnDate
+        #                    && inventTrans.ItemId == inventTransferLine.ItemId
+        #                //join TableId from inventTransOrigin
+        #                exists join inventTransOrigin
+        #                where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+        #                    && inventTransOrigin.ReferenceId == inventTransferLine.TransferId
+        #                //join TableId from inventDim
+        #                exists join inventDim
+        #                where inventDim.inventDimId == inventTrans.inventDimId
+        #                    && inventDim.InventLocationId == inventTransferTable.InventLocationIdTransit;
+        #            col11 = inventTrans.Qty;
+        #
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 04 Авг 2016, 22:32:04 ) -->
+        #            /*
+        #            select sum(qty) from inventTrans
+        #                where inventTrans.StatusIssue == StatusIssue::Sold
+        #                    && inventTrans.DatePhysical <= restOnDate
+        #                    && inventTrans.ItemId == inventTransferLine.ItemId
+        #                join TableId from inventTransOrigin
+        #                where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+        #                    && inventTransOrigin.ReferenceId == inventTransferLine.TransferId
+        #                join TableId from inventDim
+        #                where inventDim.inventDimId == inventTrans.inventDimId
+        #                    && inventDim.InventLocationId == inventTransferTable.InventLocationIdtransit;
+        #            col11 = col11 + inventTrans.Qty;
+        #            */
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 04 Авг 2016, 22:32:04 ) <--
+        #
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:26:54 ) <--
+        #            col11 = UnitOfMeasureConverter::convert(
+        #                col11,
+        #                UnitOfMeasure::findBySymbol(inventTransferLine.inventTable_IN().inventUnitId()).RecId,
+        #                UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                NoYes::No,
+        #                inventTransferLine.inventTable_IN().Product,
+        #                NoYes::No,
+        #                true);
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 07 Авг 2016, 22:05:31 ) -->
+        #            /*
+        #            col9 = col11 - col9;
+        #            */
+        #            select sum(qty) from inventTrans
+        #                where inventTrans.StatusIssue == StatusIssue::Sold
+        #                    && inventTrans.DatePhysical <= restOnDate
+        #                    && inventTrans.ItemId == inventTransferLine.ItemId
+        #                //join TableId from inventTransOrigin
+        #                exists join inventTransOrigin
+        #                where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+        #                    && inventTransOrigin.ReferenceId == inventTransferLine.TransferId
+        #                //join TableId from inventDim
+        #                exists join inventDim
+        #                where inventDim.inventDimId == inventTrans.inventDimId
+        #                    && inventDim.InventLocationId == inventTransferTable.InventLocationIdtransit;
+        #            col9 = -inventTrans.Qty;
+        #            col9 = UnitOfMeasureConverter::convert(
+        #                col9,
+        #                UnitOfMeasure::findBySymbol(inventTransferLine.inventTable_IN().inventUnitId()).RecId,
+        #                UnitOfMeasure::findBySymbol(symbolOrig).RecId,
+        #                NoYes::No,
+        #                inventTransferLine.inventTable_IN().Product,
+        #                NoYes::No,
+        #                true);
+        #            col9 = col11 - col9;
+        #            //NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 07 Авг 2016, 22:05:31 ) <--
+        #
+        #
+        #
+        #
+        #            col10 = col9 * this.getPrice(_custTable, inventTable, col9);
+        #            col12 = col11 * this.getPrice(_custTable, inventTable, col11);
+        #
+        #            if (isFold)
+        #            {
+        #                col9 = col9 / 1000;
+        #                col11 = col11 / 1000;
+        #                //vsn01CO_0420_ALRE_VSN -->
+        #                col10 = col10 / 1000;
+        #                col12 = col12 / 1000;
+        #                //vsn01CO_0420_ALRE_VSN <--
+        #            }
+        #
+        #            this.updateTransferData(_custTable, inventTable, [col9, col10, col11, col12]);
+        #        }
+        #    }
+        #
+        #    return [col9, col10, col11, col12];
+        #}
+      ENDSOURCE
+      SOURCE #getUnitSymbol
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 14:30:47 ) -->
+        #/*
+        #private UnitOfMeasureSymbol getUnitSymbol()
+        #*/
+        #protected UnitOfMeasureSymbol getUnitSymbol()
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 14:30:47 ) <--
+        #{
+        #    UnitOfMeasureSymbol         symbol;
+        #    UnitOfMeasure               unitOfMeasureTo;
+        #    UnitOfMeasure               unitOfMeasureFrom;
+        #    UnitOfMeasureConversion     unitOfMeasureConversion;
+        #    CustParameters      custParameters = CustParameters::find();
+        #    ;
+        #
+        #    switch(storageUnit)
+        #    {
+        #        case StorageUnit_ICL::Box:
+        #            symbolOrig = UnitOfMeasure::find(custParameters.PriceUOMBoxRecId_ICL).Symbol;
+        #            unitOfMeasureTo = UnitOfMeasure::find(custParameters.PriceUOMBoxRecId_ICL);
+        #            break;
+        #        case StorageUnit_ICL::Unit:
+        #            symbolOrig = UnitOfMeasure::find(custParameters.PriceUOMEachRecId_ICL).Symbol;
+        #            unitOfMeasureTo = UnitOfMeasure::find(custParameters.PriceUOMEachRecId_ICL);
+        #            break;
+        #        case StorageUnit_ICL::Weight:
+        #            symbolOrig = UnitOfMeasure::find(custParameters.PriceUOMWeightRecId_ICL).Symbol;
+        #            unitOfMeasureTo = UnitOfMeasure::find(custParameters.PriceUOMWeightRecId_ICL);
+        #            break;
+        #    }
+        #
+        #    if (isFold)
+        #    {
+        #        select firstonly RecId from unitOfMeasureConversion
+        #            where unitOfMeasureConversion.ToUnitOfMeasure == unitOfMeasureTo.RecId
+        #                && unitOfMeasureConversion.Factor == 1000
+        #                && unitOfMeasureConversion.Product == 0
+        #            join firstOnly Symbol from unitOfMeasureFrom
+        #                where unitOfMeasureFrom.RecId == unitOfMeasureConversion.FromUnitOfMeasure
+        #                    && unitOfMeasureFrom.UnitOfMeasureClass == unitOfMeasureTo.UnitOfMeasureClass;
+        #
+        #        if (!unitOfMeasureConversion.RecId)
+        #        {
+        #            throw error(strFmt("@ICL6103", unitOfMeasureTo.Symbol));
+        #        }
+        #
+        #        symbol = unitOfMeasureFrom.Symbol;
+        #    }
+        #    else
+        #    {
+        #        symbol = symbolOrig;
+        #    }
+        #
+        #    return symbol;
+        #}
+      ENDSOURCE
+      SOURCE #initQueryFiSalesPlan
+        #//NVS, ICLf1994, Промежуточный план продаж ( 27 Дек 2016, 17:50:45 )
+        #void initQueryFiSalesPlan()
+        #{
+        #    Query                   query = new Query();
+        #    QueryBuildDataSource    qbdsSecondSalesTrans;
+        #    QueryBuildDataSource    qbdsCustTable;
+        #    QueryBuildDataSource    qbdsInventTable;
+        #    ;
+        #
+        #    qbdsSecondSalesTrans = query.addDataSource(tableNum(smmSecondSalesTrans_ICL));
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, SessionLoadSS)).status(RangeStatus::Hidden);
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, Line)).status(RangeStatus::Hidden);
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, EndDate)).status(RangeStatus::Hidden);
+        #
+        #    qbdsCustTable = qbdsSecondSalesTrans.addDataSource(tableNum(CustTable));
+        #    qbdsCustTable.relations(true);
+        #    qbdsCustTable.joinMode(JoinMode::InnerJoin);
+        #    qbdsCustTable.fetchMode(QueryFetchMode::One2One);
+        #    qbdsCustTable.addRange(fieldNum(CustTable, AccountNum)).value(custAccountFiSales);
+        #
+        #    SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(CustTable, LineOfBusinessId));
+        #    SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(CustTable, SubSegmentId));
+        #    SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(CustTable, AccountNum));
+        #
+        #    qbdsInventTable = qbdsSecondSalesTrans.addDataSource(tableNum(InventTable));
+        #    qbdsInventTable.relations(true);
+        #    qbdsInventTable.joinMode(JoinMode::InnerJoin);
+        #    qbdsInventTable.fetchMode(QueryFetchMode::One2One);
+        #    qbdsInventTable.addRange(fieldNum(InventTable, ItemId)).value(itemIdFiSales);
+        #
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, InventRaitingRef_ICL));
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, FunctionalSubGroupRef_ICL));
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, TradeMarkRef_ICL));
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, BrandRefRecId_ICL));
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, GeneralName_ICL));
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, ItemId));
+        #
+        #    //vsn01CO_0285_ALRE_VSN -->
+        #    qbdsInventTable.addDataSource(tableNum(InventRaiting_ICL)).enabled(false);
+        #    qbdsInventTable.addDataSource(tableNum(FunctionalSubGroup_ICL)).enabled(false);
+        #    qbdsInventTable.addDataSource(tableNum(TradeMark_ICL)).enabled(false);
+        #    qbdsInventTable.addDataSource(tableNum(BrandTable_ICL)).enabled(false);
+        #    //vsn01CO_0285_ALRE_VSN <--
+        #
+        #    queryRun = new QueryRun(query);
+        #}
+      ENDSOURCE
+      SOURCE #initTmpData
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 15:15:35 ) -->
+        #/*
+        #private void initTmpData(CustTable _custTable, InventTable _inventTable)
+        #*/
+        #protected void initTmpData(CustTable _custTable, InventTable _inventTable)
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 15:15:35 ) <--
+        #{
+        #    if (grouping[#divisionGroup])
+        #    {
+        #        tmpData.LineOfBusinessId = _custTable.LineOfBusinessId;
+        #    }
+        #
+        #    if (grouping[#sectorGroup])
+        #    {
+        #        tmpData.SubsegmentId = _custTable.SubsegmentId;
+        #    }
+        #
+        #    if (grouping[#clientGroup])
+        #    {
+        #        tmpData.CustAccount = _custTable.AccountNum;
+        #    }
+        #
+        #    if (grouping[#goodCategoryGroup])
+        #    {
+        #        tmpData.InventRaitingName = InventRaiting_ICL::findRecId(_inventTable.InventRaitingRef_ICL).Name;
+        #    }
+        #
+        #    if (grouping[#functSubgroupGroup])
+        #    {
+        #        tmpData.FunctionalSubGroupName = FunctionalSubGroup_ICL::findForRecId(_inventTable.FunctionalSubGroupRef_ICL).Name;
+        #    }
+        #
+        #    if (grouping[#BrandGroup])
+        #    {
+        #        tmpData.Brand = BrandTable_ICL::findRecId(_inventTable.BrandRefRecId_ICL).Brand;
+        #    }
+        #
+        #    if (grouping[#TradeMarkGroup])
+        #    {
+        #        tmpData.TradeMarkId = TradeMark_ICL::findRecId(_inventTable.TradeMarkRef_ICL).TradeMarkId;
+        #    }
+        #
+        #    if (grouping[#itemNameGroup])
+        #    {
+        #        tmpData.GeneralName = _inventTable.GeneralName_ICL;
+        #    }
+        #
+        #    if (grouping[#itemIdGroup])
+        #    {
+        #        tmpData.ItemId = _inventTable.ItemId;
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #parmCustAccountFiSales
+        #//NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:11:36 )
+        #public Range parmCustAccountFiSales(Range _custAccountFiSales = custAccountFiSales)
+        #{
+        #    ;
+        #    custAccountFiSales = _custAccountFiSales;
+        #    return custAccountFiSales;
+        #}
+      ENDSOURCE
+      SOURCE #parmDontShowSales
+        #public NoYes parmDontShowSales(NoYes _dontShowSales = dontShowSales)
+        #{
+        #    ;
+        #    dontShowSales = _dontShowSales;
+        #    return dontShowSales;
+        #}
+      ENDSOURCE
+      SOURCE #parmGrouping
+        #public smmSecondSalesGrouping_ICL parmGrouping(smmSecondSalesGrouping_ICL _grouping = grouping)
+        #{
+        #    ;
+        #    grouping = _grouping;
+        #    return grouping;
+        #}
+      ENDSOURCE
+      SOURCE #parmIsFold
+        #public NoYes parmIsFold(NoYes _isFold = isFold)
+        #{
+        #    ;
+        #    isFold = _isFold;
+        #    return isFold;
+        #}
+      ENDSOURCE
+      SOURCE #parmItemIdFiSales
+        #//NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:11:36 )
+        #public ItemId parmItemIdFiSales(AccountNum _ItemIdFiSales = ItemIdFiSales)
+        #{
+        #    ;
+        #    ItemIdFiSales = _ItemIdFiSales;
+        #    return ItemIdFiSales;
+        #}
+      ENDSOURCE
+      SOURCE #parmListProductTableRefRecId
+        #public ListProductTableRefRecId_ICL parmListProductTableRefRecId(ListProductTableRefRecId_ICL _listProductTableRefRecId = listProductTableRefRecId)
+        #{
+        #    ;
+        #    listProductTableRefRecId = _listProductTableRefRecId;
+        #    return listProductTableRefRecId;
+        #}
+      ENDSOURCE
+      SOURCE #parmPurchSalesFromDate
+        #public TransDate parmPurchSalesFromDate(TransDate _purchSalesFromDate = purchSalesFromDate)
+        #{
+        #    ;
+        #    purchSalesFromDate = _purchSalesFromDate;
+        #    return purchSalesFromDate;
+        #}
+      ENDSOURCE
+      SOURCE #parmPurchSalesToDate
+        #public TransDate parmPurchSalesToDate(TransDate _purchSalesToDate = purchSalesToDate)
+        #{
+        #    ;
+        #    purchSalesToDate = _purchSalesToDate;
+        #    return purchSalesToDate;
+        #}
+      ENDSOURCE
+      SOURCE #parmQueryRun
+        #Public void parmQueryRun(container _qr)
+        #{
+        #    queryRun = new queryRun(_qr);
+        #}
+      ENDSOURCE
+      SOURCE #parmRestOnDate
+        #public TransDate parmRestOnDate(TransDate _restOnDate = restOnDate)
+        #{
+        #    ;
+        #    restOnDate = _restOnDate;
+        #    return restOnDate;
+        #}
+      ENDSOURCE
+      SOURCE #parmStorageUnit
+        #public StorageUnit_ICL parmStorageUnit(StorageUnit_ICL _storageUnit = storageUnit)
+        #{
+        #    ;
+        #    storageUnit = _storageUnit;
+        #    return storageUnit;
+        #}
+      ENDSOURCE
+      SOURCE #parmSymbol
+        #public UnitOfMeasureSymbol parmSymbol(UnitOfMeasureSymbol _symbolOrig = symbolOrig)
+        #{
+        #    ;
+        #    symbolOrig = _symbolOrig;
+        #    return symbolOrig;
+        #}
+      ENDSOURCE
+      SOURCE #updateConsigData
+        #//NVS, ICLr0953_2, Остатки на складах дистрибьюторов ( 30 Июн 2016, 15:24:09 )
+        #private void updateConsigData(CustTable _custTable, InventTable _inventTable,
+        #    container _cols5_6 = conNull())
+        #{
+        #    Qty                         col5, col7;
+        #    Amount                      col6, col8;
+        #
+        #    ;
+        #    if (_cols5_6)
+        #    {
+        #        [col5, col6, col7, col8] = _cols5_6;
+        #    }
+        #
+        #    tmpData.clear();
+        #
+        #    this.initTmpData(_custTable, _inventTable);
+        #
+        #    tmpData.Qty2    = col5;
+        #    tmpData.Amount2 = col6;
+        #    tmpData.Qty3    = col7;
+        #    tmpData.Amount3 = col8;
+        #    tmpData.insert();
+        #}
+      ENDSOURCE
+      SOURCE #updateQuery
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 13:23:35 ) -->
+        #/*
+        #private void updateQuery()
+        #*/
+        #protected void updateQuery()
+        #//UREF, ICLr0953_3, Остатки на складах дистрибьюторов ( 07 Окт 2016, 13:23:35 ) <--
+        #{
+        #    Query                   query;
+        #    QueryBuildDataSource    qbdsSmmSecondSalesTrans, qbdsCustTable, qbdsInventTable, qbds;
+        #    ;
+        #
+        #    //NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:27:53 ) -->
+        #    if (custAccountFiSales)
+        #        this.initQueryFiSalesPlan();
+        #    //NVS, ICLf1994, Промежуточный план продаж ( 28 Дек 2016, 10:27:53 ) <--
+        #    query = queryRun.query();
+        #
+        #    qbdsSmmSecondSalesTrans = query.dataSourceTable(tableNum(smmSecondSalesTrans_ICL));
+        #    qbdsSmmSecondSalesTrans.addSelectionField(fieldNum(smmSecondSalesTrans_ICL, QtyRem), SelectionField::Sum);
+        #    qbdsSmmSecondSalesTrans.addSelectionField(fieldNum(smmSecondSalesTrans_ICL, AmountRemIOP), SelectionField::Sum);
+        #    SysQuery::findOrCreateRange(qbdsSmmSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, BeginDate)).value(queryValue(dateNull()));
+        #    if (restOnDate)
+        #    {
+        #        SysQuery::findOrCreateRange(qbdsSmmSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, EndDate)).value(queryValue(restOnDate));
+        #    }
+        #
+        #    qbdsCustTable = query.dataSourceTable(tableNum(CustTable));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, AccountNum));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, CustType_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, PurchRemainders_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InclTax));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, TaxGroup));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, ConsignLocation_ICL));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, PriceGroup));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InventLocation));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, InventSiteId));
+        #    qbdsCustTable.addGroupByField(fieldNum(CustTable, Currency));
+        #
+        #    qbdsInventTable = query.dataSourceTable(tableNum(InventTable));
+        #    qbdsInventTable.addGroupByField(fieldNum(InventTable, ItemId));
+        #    qbdsInventTable.addGroupByField(fieldNum(InventTable, Product));
+        #    qbdsInventTable.addGroupByField(fieldNum(InventTable, StandardConfigId));
+        #
+        #    if (listProductTableRefRecId)
+        #    {
+        #        qbds = qbdsInventTable.addDataSource(tableNum(ReportLineInventTableList_ICL));
+        #        qbds.relations(true);
+        #        qbds.joinMode(JoinMode::ExistsJoin);
+        #
+        #        qbds = qbds.addDataSource(tableNum(ListProductTable_ICL));
+        #        qbds.relations(true);
+        #        qbds.joinMode(JoinMode::ExistsJoin);
+        #        qbds.addRange(fieldNum(ListProductTable_ICL, RecId)).value(queryValue(listProductTableRefRecId));
+        #    }
+        #
+        #    queryRun = new QueryRun(query);
+        #}
+        #
+        #
+      ENDSOURCE
+      SOURCE #updateTransferData
+        #private void updateTransferData(CustTable _custTable, InventTable _inventTable,
+        #    container _cols9_12 = conNull(),
+        #    container _cols15_18 = conNull())
+        #{
+        #    Qty                         col9, col11, col15, col17;
+        #    Amount                      col10, col12, col16, col18;
+        #
+        #    ;
+        #    if (_cols9_12)
+        #    {
+        #        [col9, col10, col11, col12] = _cols9_12;
+        #    }
+        #
+        #    if (_cols15_18)
+        #    {
+        #        [col15, col16, col17, col18] = _cols15_18;
+        #    }
+        #
+        #    tmpData.clear();
+        #    this.initTmpData(_custTable, _inventTable);
+        #
+        #
+        #    tmpData.Qty4    = col9;
+        #    tmpData.Amount4 = col10;
+        #    tmpData.Qty5    = col11;
+        #    tmpData.Amount5 = col12;
+        #
+        #    tmpData.Qty7    = col15;
+        #    tmpData.Amount7 = col16;
+        #    tmpData.Qty8    = col17;
+        #    tmpData.Amount8 = col18;
+        #    tmpData.insert();
+        #
+        #    // AxUser3, 10.04.17 , vsn01f_0015-Модификация промежуточного плана по запросам в трекере:-->
+        #    if (itemIdFiSales)
+        #        col11fi += col11;
+        #    // AxUser3, 10.04.17 , vsn01f_0015-Модификация промежуточного плана по запросам в трекере:<--
+        #
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

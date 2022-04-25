@@ -1,0 +1,703 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: XMLExcelReport_DistrRemDynamics_vsn выгружен
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #XMLExcelReport_DistrRemDynamics_vsn
+    PROPERTIES
+      Name                #XMLExcelReport_DistrRemDynamics_vsn
+      Extends             #XMLExcelReport_ICL
+      Origin              #{1ADB3F0C-61DE-406A-8D76-58B45040B868}
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #printColumns
+        #private void printColumns(TmpSmmSecondSalesRemaindersData_ICL _tmpData, int _typeGroup, str _col1, Query qLoc)
+        #{
+        #   int                                   indx;
+        #   QueryBuildDataSource                  qbds;
+        #   Query                                 queryColumn = new Query(qLoc);
+        #   QueryRun                              queryRunCol;
+        #   TmpSmmSecondSalesRemaindersData_ICL   tmpDataLoc, tmpData;
+        #   MapEnumerator                         mapEnumerator;
+        #
+        #   this.rowOpen(); // открытие строки
+        #
+        #   this.printTmpDataLine(_tmpData, _typeGroup, _col1); // вывод строки
+        #
+        #
+        #   for (indx = 2; indx <= conLen(remainsDates); indx++)
+        #   {
+        #     tmpData.linkPhysicalTableInstance(mapDateCalc.lookup(strFmt('%1', conPeek(remainsDates, indx))).getTmpData());
+        #
+        #     qbds = queryColumn.dataSourceTable(tableNum(TmpSmmSecondSalesRemaindersData_ICL));
+        #
+        #        switch(_typeGroup)
+        #        {
+        #            case #divisionGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, LineOfBusinessId)).value(_tmpData.LineOfBusinessId);
+        #                break;
+        #            case #sectorGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, SubsegmentId)).value(_tmpData.SubsegmentId);
+        #                break;
+        #            case #clientGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, CustAccount)).value(_tmpData.CustAccount);
+        #                break;
+        #            case #goodCategoryGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, InventRaitingName)).value(_tmpData.InventRaitingName);
+        #                break;
+        #            case #functSubgroupGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, FunctionalSubGroupName)).value(_tmpData.FunctionalSubGroupName);
+        #                break;
+        #            case #BrandGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, Brand)).value(_tmpData.Brand);
+        #                break;
+        #            case #TradeMarkGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, TradeMarkId)).value(_tmpData.TradeMarkId);
+        #                break;
+        #            case #itemNameGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, GeneralName)).value(_tmpData.GeneralName);
+        #                break;
+        #            case #itemIdGroup:
+        #                qbds.addRange(fieldNum(TmpSmmSecondSalesRemaindersData_ICL, ItemId)).value(_tmpData.ItemId);
+        #                break;
+        #         }
+        #
+        #        queryRunCol = new QueryRun(queryColumn);
+        #        queryRunCol.setCursor(tmpData);
+        #        queryRunCol.next();
+        #             tmpDataLoc = queryRunCol.get(tableNum(TmpSmmSecondSalesRemaindersData_ICL));
+        #             this.printTmpDataLine(tmpDataLoc, _typeGroup, _col1, NoYes::Yes); // вывод строки
+        #   }
+        #    this.rowClose(); // закрытие строки
+        #}
+      ENDSOURCE
+      SOURCE #canGoBatch
+        #public boolean canGoBatch()
+        #{
+        #    return false;
+        #}
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #class XMLExcelReport_DistrRemDynamics_vsn extends XMLExcelReport_ICL
+        #{
+        #    smmSecondSalesGrouping_ICL          grouping;                      // группировки
+        #    TransDate                           restOnDateFrom, restOnDateTo;  // остаток на дату
+        #    ListProductTableRefRecId_ICL        listProductTableRefRecId;      // recid для таблицы "Список товаров"
+        #    StorageUnit_ICL                     storageUnit;                   // единицы измерения
+        #    NoYes                               isFold;                        // складывать
+        #    smmParametersTable                  smmParametersTable;            // Параметры модуля "Продажи и маркетинг"
+        #    QueryRun                            queryRun;                      // Запрос
+        #    UnitOfMeasureSymbol                 symbolOrig;                    // Единица измерения
+        #    str 1000                            strQueryFilter;                // фильтр
+        #    int                                 sortCust;                      // количество сортировок по клиенту
+        #    container                           remainsDates;                  // на какие даты формируется отчет
+        #    int                                 indxRow;
+        #    boolean                             isNewDate;
+        #    smmSecondSalesRemaindersData_ICL    dateCalc;                      // ссылка на класс
+        #    Map                                 mapDateCalc;
+        #
+        #    #SmmSecondSalesRemaindersDataRep_ICL // Подключение макроса
+        #
+        #    #DEFINE.CurrentVersion(2)
+        #
+        #    #LOCALMACRO.CurrentList
+        #        restOnDateFrom,
+        #        restOnDateTo,
+        #        listProductTableRefRecId,
+        #        storageUnit,
+        #        isFold,
+        #        grouping
+        #    #ENDMACRO
+        #}
+      ENDSOURCE
+      SOURCE #dialog
+        #protected Object dialog()
+        #{
+        #    DialogRunbase   dialog = Dialog::newFormnameRunbase(formstr(smmDistributorRemainderDynamics_VSN),this);
+        #    ;
+        #    dialog = this.dialogInternal(dialog);
+        #
+        #    return dialog;
+        #}
+      ENDSOURCE
+      SOURCE #getData
+        #private smmSecondSalesRemaindersData_ICL getData(TransDate  restOnDate = systemDateGet())
+        #{
+        #    TmpSmmSecondSalesRemaindersData_ICL tmpDataTotal;
+        #    int                                 idx;
+        #    smmSecondSalesRemaindersData_ICL    dateCalculate;
+        #    ;
+        #
+        #    dateCalculate = new smmSecondSalesRemaindersData_ICL();
+        #
+        #    dateCalculate.parmDontShowSales(NoYes::Yes);
+        #    dateCalculate.parmGrouping(this.parmGrouping());
+        #    dateCalculate.parmIsFold(this.parmIsFold());
+        #    dateCalculate.parmListProductTableRefRecId(this.parmListProductTableRefRecId());
+        #
+        #
+        #    if (!queryRun.query().dataSourceTable(tableNum(InventRaiting_ICL)).rangeField(fieldNum(InventRaiting_ICL, RaitingId)).value())
+        #        queryRun.query().dataSourceTable(tableNum(InventRaiting_ICL)).enabled(false);
+        #    if (!queryRun.query().dataSourceTable(tableNum(FunctionalSubGroup_ICL)).rangeField(fieldNum(FunctionalSubGroup_ICL, SubGroupId)).value())
+        #        queryRun.query().dataSourceTable(tableNum(FunctionalSubGroup_ICL)).enabled(false);
+        #    if (!queryRun.query().dataSourceTable(tableNum(TradeMark_ICL)).rangeField(fieldNum(TradeMark_ICL, TradeMarkId)).value())
+        #        queryRun.query().dataSourceTable(tableNum(TradeMark_ICL)).enabled(false);
+        #    if (!queryRun.query().dataSourceTable(tableNum(BrandTable_ICL)).rangeField(fieldNum(BrandTable_ICL, Brand)).value())
+        #        queryRun.query().dataSourceTable(tableNum(BrandTable_ICL)).enabled(false);
+        #
+        #
+        #    dateCalculate.parmQueryRun(queryRun.pack());
+        #    dateCalculate.parmRestOnDate(restOnDate);
+        #    dateCalculate.parmStorageUnit(this.parmStorageUnit());
+        #     // dateCalc.parmRestOnDate(04\09\2021);
+        #    // dateCalc.parmRestOnDate(04\07\2021);
+        #
+        #    dateCalculate.calc();
+        #
+        #   return dateCalculate;
+        #}
+      ENDSOURCE
+      SOURCE #getRemainsDates
+        #private container getRemainsDates()
+        #{
+        #    WorkCalendarTable     workCalendarTable;
+        #    SmmSSLoadPeriod_ICL   smmSSLoadPeriod;
+        #    container             result;
+        #
+        #    while select smmSSLoadPeriod join workCalendarTable
+        #          order by smmSSLoadPeriod.PeriodEnd asc
+        #          where (smmSSLoadPeriod.PeriodEnd >= this.parmRestOnDateFrom() && smmSSLoadPeriod.PeriodEnd <= this.parmRestOnDateTo()) &&
+        #                smmSSLoadPeriod.CalendarId == workCalendarTable.CalendarId &&
+        #                workCalendarTable.CalendarId == 'CRM_ВП' {
+        #
+        #          result += smmSSLoadPeriod.PeriodEnd;
+        #     }
+        #
+        #  return result;
+        #
+        #}
+      ENDSOURCE
+      SOURCE #getUnitSymbol
+        #private UnitOfMeasureSymbol getUnitSymbol()
+        #{
+        #    UnitOfMeasureSymbol         symbol;
+        #    UnitOfMeasure               unitOfMeasureTo;
+        #    UnitOfMeasure               unitOfMeasureFrom;
+        #    UnitOfMeasureConversion     unitOfMeasureConversion;
+        #    CustParameters      custParameters = CustParameters::find();
+        #    ;
+        #
+        #    switch(storageUnit)
+        #    {
+        #        case StorageUnit_ICL::Box:
+        #            symbolOrig = UnitOfMeasure::find(custParameters.PriceUOMBoxRecId_ICL).Symbol;
+        #            unitOfMeasureTo = UnitOfMeasure::find(custParameters.PriceUOMBoxRecId_ICL);
+        #            break;
+        #        case StorageUnit_ICL::Unit:
+        #            symbolOrig = UnitOfMeasure::find(custParameters.PriceUOMEachRecId_ICL).Symbol;
+        #            unitOfMeasureTo = UnitOfMeasure::find(custParameters.PriceUOMEachRecId_ICL);
+        #            break;
+        #        case StorageUnit_ICL::Weight:
+        #            symbolOrig = UnitOfMeasure::find(custParameters.PriceUOMWeightRecId_ICL).Symbol;
+        #            unitOfMeasureTo = UnitOfMeasure::find(custParameters.PriceUOMWeightRecId_ICL);
+        #            break;
+        #    }
+        #
+        #    if (isFold)
+        #    {
+        #        select firstonly RecId from unitOfMeasureConversion
+        #            where unitOfMeasureConversion.ToUnitOfMeasure == unitOfMeasureTo.RecId
+        #                && unitOfMeasureConversion.Factor == 1000
+        #                && unitOfMeasureConversion.Product == 0
+        #            join firstOnly Symbol from unitOfMeasureFrom
+        #                where unitOfMeasureFrom.RecId == unitOfMeasureConversion.FromUnitOfMeasure
+        #                    && unitOfMeasureFrom.UnitOfMeasureClass == unitOfMeasureTo.UnitOfMeasureClass;
+        #
+        #        if (!unitOfMeasureConversion.RecId)
+        #        {
+        #            throw error(strFmt("@ICL6103", unitOfMeasureTo.Symbol));
+        #        }
+        #
+        #        symbol = unitOfMeasureFrom.Symbol;
+        #    }
+        #    else
+        #    {
+        #        symbol = symbolOrig;
+        #    }
+        #
+        #    return symbol;
+        #}
+      ENDSOURCE
+      SOURCE #initQuery
+        #void initQuery()
+        #{
+        #    Query                   query = new Query();
+        #    QueryBuildDataSource    qbdsSecondSalesTrans;       // Вторичные продажи
+        #    QueryBuildDataSource    qbdsCustTable;              // Клиенты
+        #    QueryBuildDataSource    qbdsInventTable;            // Номенклатуры
+        #    QueryBuildDataSource    qbdsInventRaiting;          // Товарные категории
+        #    QueryBuildDataSource    qbdsFunctionalSubGroup;     // Функциональные подгруппы
+        #    QueryBuildDataSource    qbdsTradeMark;              // Товарная марка
+        #    QueryBuildDataSource    qbdsBrand;                  // Бренд
+        #    ;
+        #
+        #    // Вторичные продажи
+        #    qbdsSecondSalesTrans = query.addDataSource(tableNum(smmSecondSalesTrans_ICL));
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, SessionLoadSS)).status(RangeStatus::Hidden);
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, Line)).status(RangeStatus::Hidden);
+        #    SysQuery::findOrCreateRange(qbdsSecondSalesTrans, fieldNum(smmSecondSalesTrans_ICL, EndDate)).status(RangeStatus::Hidden);
+        #
+        #    // Клиенты
+        #    qbdsCustTable = qbdsSecondSalesTrans.addDataSource(tableNum(CustTable));
+        #    qbdsCustTable.relations(true);
+        #    qbdsCustTable.joinMode(JoinMode::InnerJoin);
+        #    qbdsCustTable.fetchMode(QueryFetchMode::One2One);
+        #    SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(CustTable, LineOfBusinessId));
+        #    SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(CustTable, SubSegmentId));
+        #    SysQuery::findOrCreateRange(qbdsCustTable, fieldNum(CustTable, AccountNum));
+        #
+        #    // Номенклатуры
+        #    qbdsInventTable = qbdsSecondSalesTrans.addDataSource(tableNum(InventTable));
+        #    qbdsInventTable.relations(true);
+        #    qbdsInventTable.joinMode(JoinMode::InnerJoin);
+        #    qbdsInventTable.fetchMode(QueryFetchMode::One2One);
+        #    //vsn01CO_0270__VSN -->
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, ItemId));
+        #
+        #    // Товарные категории
+        #    qbdsInventRaiting = qbdsInventTable.addDataSource(tableNum(InventRaiting_ICL));
+        #    qbdsInventRaiting.relations(true);
+        #    qbdsInventRaiting.joinMode(JoinMode::ExistsJoin);
+        #    qbdsInventRaiting.fetchMode(QueryFetchMode::One2One);
+        #    SysQuery::findOrCreateRange(qbdsInventRaiting, fieldNum(InventRaiting_ICL, RaitingId));
+        #
+        #    // Функциональные подгруппы
+        #    qbdsFunctionalSubGroup = qbdsInventTable.addDataSource(tableNum(FunctionalSubGroup_ICL));
+        #    qbdsFunctionalSubGroup.relations(true);
+        #    qbdsFunctionalSubGroup.joinMode(JoinMode::ExistsJoin);
+        #    qbdsFunctionalSubGroup.fetchMode(QueryFetchMode::One2One);
+        #    SysQuery::findOrCreateRange(qbdsFunctionalSubGroup, fieldNum(FunctionalSubGroup_ICL, SubGroupId));
+        #
+        #    // Товарная марка
+        #    qbdsTradeMark = qbdsInventTable.addDataSource(tableNum(TradeMark_ICL));
+        #    qbdsTradeMark.relations(true);
+        #    qbdsTradeMark.joinMode(JoinMode::ExistsJoin);
+        #    qbdsTradeMark.fetchMode(QueryFetchMode::One2One);
+        #    SysQuery::findOrCreateRange(qbdsTradeMark, fieldNum(TradeMark_ICL, TradeMarkId));
+        #
+        #    // Бренд
+        #    qbdsBrand = qbdsInventTable.addDataSource(tableNum(BrandTable_ICL));
+        #    qbdsBrand.relations(true);
+        #    qbdsBrand.joinMode(JoinMode::ExistsJoin);
+        #    qbdsBrand.fetchMode(QueryFetchMode::One2One);
+        #    SysQuery::findOrCreateRange(qbdsBrand, fieldNum(BrandTable_ICL, Brand));
+        #    SysQuery::findOrCreateRange(qbdsInventTable, fieldNum(InventTable, GeneralName_ICL));
+        #
+        #
+        #
+        #    queryRun = new QueryRun(query);
+        #}
+      ENDSOURCE
+      SOURCE #pack
+        #public container pack()
+        #{
+        #    return [#CurrentVersion, #CurrentList, queryRun.pack()];
+        #}
+      ENDSOURCE
+      SOURCE #parmGrouping
+        #public smmSecondSalesGrouping_ICL parmGrouping(smmSecondSalesGrouping_ICL _grouping = grouping)
+        #{
+        #    ;
+        #    grouping = _grouping;
+        #    return grouping;
+        #}
+      ENDSOURCE
+      SOURCE #parmIsFold
+        #public NoYes parmIsFold(NoYes _isFold = isFold)
+        #{
+        #    ;
+        #    isFold = _isFold;
+        #    return isFold;
+        #}
+      ENDSOURCE
+      SOURCE #parmListProductTableRefRecId
+        #public ListProductTableRefRecId_ICL parmListProductTableRefRecId(ListProductTableRefRecId_ICL _listProductTableRefRecId = listProductTableRefRecId)
+        #{
+        #    ;
+        #    listProductTableRefRecId = _listProductTableRefRecId;
+        #    return listProductTableRefRecId;
+        #}
+      ENDSOURCE
+      SOURCE #parmRestOnDateFrom
+        #public TransDate parmRestOnDateFrom(TransDate _restOnDateFrom = restOnDateFrom)
+        #{
+        #    restOnDateFrom = _restOnDateFrom;
+        #
+        #    return restOnDateFrom;
+        #}
+      ENDSOURCE
+      SOURCE #parmRestOnDateTo
+        #public TransDate parmRestOnDateTo(TransDate _restOnDateTo = restOnDateTo)
+        #{
+        #    restOnDateTo = _restOnDateTo;
+        #
+        #    return restOnDateTo;
+        #}
+      ENDSOURCE
+      SOURCE #parmStorageUnit
+        #public StorageUnit_ICL parmStorageUnit(StorageUnit_ICL _storageUnit = storageUnit)
+        #{
+        #    ;
+        #    storageUnit = _storageUnit;
+        #    return storageUnit;
+        #}
+      ENDSOURCE
+      SOURCE #preInit
+        #void preInit()
+        #{
+        #    super();
+        #    maxColumn = 100;
+        #    this.reportInit();
+        #    this.parmSheetName("Динамика остатков дистрибьютор");
+        #    smmParametersTable = smmParametersTable::find();
+        #    remainsDates = this.getRemainsDates();  // даты для которых будут формироваться остатки
+        #    // remainsDates = [04\07\2021, 04\09\2021];
+        #    mapDateCalc = new Map(Types::String, Types::Class);
+        #
+        #}
+      ENDSOURCE
+      SOURCE #printBody
+        #public void printBody()
+        #{
+        #    ExcelCellStyle_ICL                  exStyle;
+        #    str                                 lineStyle;
+        #    TmpSmmSecondSalesRemaindersData_ICL tmpDataTotal;
+        #    TransDate                           key;
+        #    ;
+        #
+        #    for (indxRow = 1; indxRow <= conLen(remainsDates); indxRow++) {
+        #        key = conPeek(remainsDates, indxRow);
+        #        mapDateCalc.insert( strFmt("%1", key), this.getData(key));
+        #    }
+        #
+        #    dateCalc = mapDateCalc.lookup(strFmt("%1", conPeek(remainsDates, 1)));
+        #
+        #    this.printGroupTmpData(tmpDataTotal, #divisionGroup);
+        #
+        #    /*
+        #    for (indxRow = 1; indxRow <= conLen(remainsDates); indxRow++) {
+        #
+        #        isNewDate = true;
+        #
+        #       // Сбор данных
+        #       this.getData(conPeek(remainsDates, indxRow));
+        #
+        #       // вывод строк
+        #       this.printGroupTmpData(tmpDataTotal, #divisionGroup);
+        #
+        #       // Итого
+        #       tmpDataTotal.linkPhysicalTableInstance(dateCalc.getTmpData());
+        #       select #SmmSecondSalesRemaindersTmpSumFields_ICL from tmpDataTotal;
+        #       exStyle   = ExcelCellStyle_ICL::find(8);
+        #       lineStyle = this.createStyle(exStyle, NoYes::No, 9, ExcelColor_ICL::None, ExcelColor_ICL::corall);
+        #       this.rowOpen();
+        #       textRep +=  this.addCell_Str('', lineStyle);
+        #       textRep +=  this.addCell_Str(#totalDescr, lineStyle);
+        #       textRep +=  this.addCell_Real(tmpDataTotal.Qty3 + tmpDataTotal.Qty5,        lineStyle, indxRow == 1 ? 0: indxRow + (indxRow + 1));
+        #       textRep +=  this.addCell_Real(tmpDataTotal.Amount3 + tmpDataTotal.Amount5,  lineStyle);
+        #       this.rowClose();
+        #
+        #    }
+        #
+        #    */
+        #
+        #}
+      ENDSOURCE
+      SOURCE #printGroupTmpData
+        #private void printGroupTmpData(TmpSmmSecondSalesRemaindersData_ICL _dataPrev, int _group)
+        #{
+        #    QueryRun                            qrLoc;
+        #    Query                               qLoc;
+        #    TmpSmmSecondSalesRemaindersData_ICL tmpDataLoc;
+        #    str                                 col1;
+        #    TmpSmmSecondSalesRemaindersData_ICL tmpData;
+        #
+        #    tmpData.linkPhysicalTableInstance (dateCalc.getTmpData());
+        #
+        #    if (grouping[_group])
+        #    {
+        #        qLoc = new Query();
+        #        qLoc = TmpSmmSecondSalesRemaindersData_ICL::newQuery(qLoc, _group, _dataPrev);
+        #        qrLoc = new QueryRun(qLoc);
+        #        qrLoc.setCursor(tmpData);
+        #        while(qrLoc.next())
+        #        {
+        #            tmpDataLoc = qrLoc.get(tableNum(TmpSmmSecondSalesRemaindersData_ICL));
+        #            if(_group == #clientGroup)
+        #            {
+        #                sortCust ++;
+        #                col1 = int2str(sortCust);
+        #            }
+        #            if(_group == #itemIdGroup)
+        #            {
+        #                col1 = tmpDataLoc.ItemId;
+        #            }
+        #
+        #            // this.printTmpDataLine(tmpDataLoc, _group, col1); // вывод строки
+        #               this.printColumns(tmpDataLoc, _group, col1, qLoc);
+        #
+        #            if(_group < #itemIdGroup)
+        #                this.printGroupTmpData(tmpDataLoc, _group + 1);
+        #        }
+        #    }
+        #    else
+        #    {
+        #        if(_group < #itemIdGroup)
+        #            this.printGroupTmpData(_dataPrev, _group + 1);
+        #
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #printHeader
+        #public void printHeader()
+        #{
+        #    ExcelCellStyle_ICL  exStyle;
+        #    str                 stName;
+        #    str                 thousRubPrefixStr = isFold ? 'тыс.' : "";
+        #    int                 indx;
+        #    ;
+        #
+        #
+        #
+        #    // Ширина столбцов
+        #    textRep += strFmt("@ICL3387", 25);
+        #    textRep += strFmt("@ICL3387", 300);
+        #    for (indx = 1; indx <= conLen(remainsDates); indx++) {
+        #        textRep += strFmt("@ICL3387", 50);
+        #        textRep += strFmt("@ICL3387", 50);
+        #    }
+        #
+        #    exStyle  = ExcelCellStyle_ICL::find(#TitleStyle2);
+        #    stName   = this.createStyle(exStyle, NoYes::No, 11);
+        #
+        #    this.rowOpen();
+        #    textRep += this.addCell_Str(strfmt("Динамика остатков дистрибъютера с %1 по %2", this.parmRestOnDateFrom(), this.parmRestOnDateTo()),stName, 0, 19);
+        #    this.rowClose();
+        #
+        #    this.rowOpen();
+        #    textRep += this.addCell_Str('Фильтры: '+strqueryFilter, "" ,0 , 19);
+        #    this.rowClose();
+        #
+        #    exStyle  = ExcelCellStyle_ICL::find(#Header);
+        #    stName  = this.createStyle(exStyle,NoYes::No,8,0);
+        #
+        #    this.rowOpen(40);
+        #    textRep += this.addCell_Str(#numStr,stName,0,0,1);        // № п/п
+        #    textRep += this.addCell_Str(#grouping,stName,0,0,1);      // Группировка
+        #    for (indx = 1; indx <= conLen(remainsDates); indx++) {    // Общие остатки
+        #        textRep += this.addCell_Str(strFmt("Общие остатки на %1", conPeek(remainsDates, indx)),stName,0,1);
+        #    }
+        #    this.rowClose();
+        #
+        #    this.rowOpen();
+        #    for (indx = 1; indx <= conLen(remainsDates); indx++) {
+        #
+        #        textRep += this.addCell_Str(this.getUnitSymbol(),stName, indx == 1 ? 3 : 0);
+        #        textRep += this.addCell_Str(thousRubPrefixStr + #rubStr,stName);
+        #    }
+        #    this.rowClose();
+        #
+        #
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #printTmpDataLine
+        #private void printTmpDataLine(TmpSmmSecondSalesRemaindersData_ICL _tmpData, int _typeGroup, str _col1, NoYes  isColumn = NoYes::No)
+        #{
+        #    ExcelCellStyle_ICL  exStyle;
+        #    str                 lineStyle, lineStyle1, lineStyle2, lineStyle3, lineStyle4,
+        #                        lineStyle5, lineStyle6, lineStyle7, lineStyle8, lineStyle9;
+        #
+        #
+        #    exStyle             = ExcelCellStyle_ICL::find(5);
+        #    lineStyle1 = this.createStyle(exStyle, NoYes::No, 9, ExcelColor_ICL::None, ExcelColor_ICL::lightblue_c5d9f1);
+        #    lineStyle2 = this.createStyle(exStyle, NoYes::No, 9, ExcelColor_ICL::None, ExcelColor_ICL::pale_green);
+        #    lineStyle3 = this.createStyle(exStyle, NoYes::No, 9);
+        #    exStyle             = ExcelCellStyle_ICL::find(8);
+        #    lineStyle4 = this.createStyle(exStyle, NoYes::No, 8, ExcelColor_ICL::None, ExcelColor_ICL::light_yellow);
+        #    lineStyle5 = this.createStyle(exStyle, NoYes::No, 8, ExcelColor_ICL::None, ExcelColor_ICL::ivory);
+        #    lineStyle6 = this.createStyle(exStyle, NoYes::No, 8, ExcelColor_ICL::None, ExcelColor_ICL::ivory);
+        #    exStyle             = ExcelCellStyle_ICL::find(#bodyStyle);
+        #    lineStyle7 = this.createStyle(exStyle, NoYes::No, 8);
+        #    lineStyle8 = this.createStyle(exStyle, NoYes::No, 8, ExcelColor_ICL::None, ExcelColor_ICL::gray_e4dfec);
+        #    lineStyle9 = this.createStyle(exStyle, NoYes::No, 8);
+        #
+        #
+        #    switch(_typeGroup)
+        #    {
+        #        case #divisionGroup:
+        #            lineStyle = lineStyle1;
+        #            break;
+        #        case #sectorGroup:
+        #            lineStyle = lineStyle2;
+        #            break;
+        #        case #clientGroup:
+        #            lineStyle = lineStyle3;
+        #            break;
+        #        case #goodCategoryGroup:
+        #            lineStyle = lineStyle4;
+        #            break;
+        #        case #functSubgroupGroup:
+        #            lineStyle = lineStyle5;
+        #            break;
+        #        case #BrandGroup:
+        #            lineStyle = lineStyle6;
+        #            break;
+        #        case #TradeMarkGroup:
+        #            lineStyle = lineStyle7;
+        #            break;
+        #        case #itemNameGroup:
+        #            lineStyle = lineStyle8;
+        #            break;
+        #        case #itemIdGroup:
+        #            lineStyle = lineStyle9;
+        #            break;
+        #    }
+        #
+        #
+        #      //  this.rowOpen();
+        #            if(isColumn == NoYes::No){
+        #                textRep +=  this.addCell_Str(_col1, lineStyle);
+        #                textRep +=  this.addCell_Str(_tmpData.descriptionByType(_typeGroup), lineStyle);
+        #            }
+        #            textRep +=  this.addCell_Real(_tmpData.Qty3 + _tmpData.Qty5,        lineStyle);
+        #            textRep +=  this.addCell_Real(_tmpData.Amount3 + _tmpData.Amount5,  lineStyle);
+        #      //  this.rowClose();
+        #/*
+        #
+        #        if(isNewDate) {
+        #            textRep += '<Row ss:Index = "5"> \n';
+        #        }
+        #        else {
+        #         this.rowOpen();
+        #        }
+        #            textRep +=  this.addCell_Real(_tmpData.Qty3 + _tmpData.Qty5,        lineStyle, indxRow*2 + 1);
+        #            textRep +=  this.addCell_Real(_tmpData.Amount3 + _tmpData.Amount5,  lineStyle);
+        #        this.rowClose();
+        #    */
+        #
+        #
+        #
+        #    isNewDate = false;
+        #
+        #}
+      ENDSOURCE
+      SOURCE #queryRun
+        #public QueryRun queryRun()
+        #{
+        #    if (!queryRun)
+        #    {
+        #        this.initQuery();
+        #    }
+        #
+        #    return queryRun;
+        #}
+      ENDSOURCE
+      SOURCE #run
+        #public void run()
+        #{
+        #    int Index_DS, index_Range;
+        #    str tempQueryFilter;
+        #    boolean addStr;
+        #
+        #    for (Index_DS = 1; Index_DS<= queryRun.query().dataSourceCount(); Index_DS++)
+        #    {
+        #        addStr = false;
+        #        if ((queryRun.query().dataSourceNo(Index_DS).rangeCount() > 0))
+        #        {   //пишем таблицу
+        #            tempQueryFilter = tableId2pname(queryRun.query().dataSourceNo(Index_DS).table())+':>';
+        #        }
+        #        for (index_Range = 1; index_Range<= queryRun.query().dataSourceNo(Index_DS).rangeCount();index_Range++)
+        #        {
+        #            if (strlen(strLRTrim(queryRun.query().dataSourceNo(Index_DS).range(index_Range).value()))>=1)
+        #            {   //пишем поле и диапазон
+        #                tempQueryFilter += fieldId2pname(queryRun.query().dataSourceNo(Index_DS).table(), queryRun.query().dataSourceNo(Index_DS).range(index_Range).field())+': '+queryRun.query().dataSourceNo(Index_DS).range(index_Range).value()+'; ';
+        #                addStr = true;
+        #            }
+        #        }
+        #        if (addStr)
+        #        {
+        #            strQueryFilter += tempQueryFilter;
+        #        }
+        #    }
+        #    super();
+        #}
+      ENDSOURCE
+      SOURCE #showQueryValues
+        #public boolean showQueryValues()
+        #{
+        #    return true;
+        #}
+      ENDSOURCE
+      SOURCE #unpack
+        #public boolean unpack(container _packedClass)
+        #{
+        #    boolean     ret;
+        #    container   queryCon;
+        #    Version version = RunBase::getVersion(_packedClass);
+        #    ;
+        #    switch (version)
+        #    {
+        #        case #CurrentVersion:
+        #            [version, #CurrentList, queryCon] = _packedClass;
+        #            if (SysQuery::isPackedOk(queryCon))
+        #            {
+        #                queryRun = new queryRun(this.updateUnpackedQuery(new Query(queryCon)));
+        #            }
+        #            else
+        #                this.initQuery();
+        #            break;
+        #        default:
+        #            ret = false;
+        #    }
+        #    return ret;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #updateUnpackedQuery
+        #private Query updateUnpackedQuery(Query _q)
+        #{
+        #    QueryBuildDataSource    qbds;
+        #    ;
+        #
+        #    qbds = _q.dataSourceTable(tableNum(smmSecondSalesTrans_ICL));
+        #
+        #    SysQuery::findOrCreateRange(qbds, fieldNum(smmSecondSalesTrans_ICL, SessionLoadSS)).status(RangeStatus::Hidden);
+        #    SysQuery::findOrCreateRange(qbds, fieldNum(smmSecondSalesTrans_ICL, Line)).status(RangeStatus::Hidden);
+        #    SysQuery::findOrCreateRange(qbds, fieldNum(smmSecondSalesTrans_ICL, EndDate)).status(RangeStatus::Hidden);
+        #
+        #    return _q;
+        #}
+      ENDSOURCE
+      SOURCE #main
+        #public static void main(Args    _args)
+        #{
+        #    XMLExcelReport_DistrRemDynamics_vsn  distrRemDynamics =   new XMLExcelReport_DistrRemDynamics_vsn();
+        #    ;
+        #
+        #    if (distrRemDynamics.prompt())
+        #    {
+        #        distrRemDynamics.run();
+        #    }
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END
