@@ -1,3 +1,0 @@
-*.xpp diff=java
-*.xpp linguist-language=Java
-*.xpo eol=crlf
